@@ -1,18 +1,18 @@
-package service.mapper;
+package homework.homework2.service.mapper;
 
-import entity.user.User;
-import exception.MappingException;
-import service.SimpleCache;
+import homework.homework2.entity.user.User;
+import homework.homework2.exception.MappingException;
+import homework.homework2.service.SimpleCache;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
 
+@Service
+@AllArgsConstructor
 public class UserMapper implements SimpleMapper<User> {
 
     SimpleCache simpleCache;
-
-    public UserMapper(SimpleCache simpleCache) {
-        this.simpleCache = simpleCache;
-    }
 
     private final Pattern pattern = Pattern.compile("\\d+,[а-я]+", Pattern.UNICODE_CASE |
             Pattern.CASE_INSENSITIVE);

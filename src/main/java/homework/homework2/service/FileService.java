@@ -1,22 +1,28 @@
-package service;
+package homework.homework2.service;
 
-import service.mapper.TaskMapper;
-import service.mapper.UserMapper;
+import homework.homework2.service.mapper.TaskMapper;
+import homework.homework2.service.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
 public class FileService {
     private Path usersFile;
+
     private Path tasksFile;
     private SimpleCache simpleCache;
     private TaskMapper taskMapper;
     private UserMapper userMapper;
 
-    public FileService(Path usersFile, Path tasksFile, SimpleCache simpleCache, TaskMapper taskMapper,
-                       UserMapper userMapper) {
+    public FileService(@Qualifier("users")Path usersFile, @Qualifier("tasks")Path tasksFile, SimpleCache simpleCache,
+                       TaskMapper taskMapper, UserMapper userMapper) {
         this.usersFile = usersFile;
         this.tasksFile = tasksFile;
         this.simpleCache = simpleCache;
@@ -54,6 +60,19 @@ public class FileService {
             System.out.println("состояние сохранено");
         } catch (IOException e) {
             throw new RuntimeException();
+        }
+    }
+    @PostConstruct
+    public void mappingFiles(){
+        try {
+            List<String> strings = Files.lines(usersFile).collect(Collectors.toList());
+            userMapper.mapToEntityList(strings);
+
+            List<String> stringsTasks = Files.lines(tasksFile).collect(Collectors.toList());
+            taskMapper.mapToEntityList(stringsTasks);
+        }
+        catch (IOException ex){
+            throw new RuntimeException(ex);
         }
     }
 }

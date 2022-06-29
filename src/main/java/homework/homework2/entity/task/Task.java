@@ -1,7 +1,9 @@
-package entity.task;
+package homework.homework2.entity.task;
 
-import entity.EnumStatus;
-import entity.user.User;
+import homework.homework2.entity.EnumStatus;
+import homework.homework2.entity.user.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class Task {
     private static Long maxIdValue = 0L;
     private final Long id;
@@ -30,38 +34,6 @@ public class Task {
 
     public static Long getGlobalId() {
         return ++maxIdValue;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public EnumStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(EnumStatus status) {
-        this.status = status;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     @Override

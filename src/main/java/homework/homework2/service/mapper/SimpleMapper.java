@@ -1,6 +1,6 @@
-package service.mapper;
+package homework.homework2.service.mapper;
 
-import exception.MappingException;
+import homework.homework2.exception.MappingException;
 
 import java.util.ArrayList;
 import java.util.Collection;

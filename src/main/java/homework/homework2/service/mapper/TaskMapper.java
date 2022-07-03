@@ -1,10 +1,11 @@
-package service.mapper;
+package homework.homework2.service.mapper;
 
-import entity.EnumStatus;
-import entity.task.Task;
-import entity.user.User;
-import exception.MappingException;
-import service.SimpleCache;
+import homework.homework2.entity.EnumStatus;
+import homework.homework2.entity.task.Task;
+import homework.homework2.entity.user.User;
+import homework.homework2.exception.MappingException;
+import homework.homework2.service.SimpleCache;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Service
 public class TaskMapper implements SimpleMapper<Task> {
     private SimpleCache simpleCache;
     private boolean update = false;
@@ -51,8 +53,12 @@ public class TaskMapper implements SimpleMapper<Task> {
             Task taskInCache = simpleCache.getTask(idTemp);
             if (taskInCache != null && !update)
                 log.add(String.format("Задача с указанным id=%d уже создана:\n%s", idTemp, taskInCache));
-            else
-                id = idTemp;
+            else{
+                if (taskInCache==null&&update)
+                    log.add("Не существует задачи с id="+idTemp);
+                else
+                    id = idTemp;
+            }
         } catch (Exception ex) {
             log.add("Не удалось получить поле id из файла");
         }

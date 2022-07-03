@@ -1,9 +1,10 @@
+package homework.homework2;
 
-import service.FileService;
-import service.SimpleCache;
-import service.mapper.TaskMapper;
-import service.mapper.UserMapper;
-import shell.SimpleShellProvider;
+import homework.homework2.service.FileService;
+import homework.homework2.service.SimpleCache;
+import homework.homework2.service.mapper.TaskMapper;
+import homework.homework2.service.mapper.UserMapper;
+import homework.homework2.shell.SimpleShellProvider;
 
 import java.io.IOException;
 import java.nio.file.Files;

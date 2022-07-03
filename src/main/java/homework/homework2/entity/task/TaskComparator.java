@@ -1,4 +1,4 @@
-package entity.task;
+package homework.homework2.entity.task;
 
 import java.util.Comparator;
 

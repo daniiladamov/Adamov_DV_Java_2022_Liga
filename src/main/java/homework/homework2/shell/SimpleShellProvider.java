@@ -1,13 +1,14 @@
-package shell;
+package homework.homework2.shell;
 
-import entity.EnumStatus;
-import entity.task.Task;
-import entity.task.TaskComparator;
-import entity.user.User;
-import exception.MappingException;
-import service.FileService;
-import service.SimpleCache;
-import service.mapper.TaskMapper;
+import homework.homework2.entity.EnumStatus;
+import homework.homework2.entity.task.Task;
+import homework.homework2.entity.task.TaskComparator;
+import homework.homework2.entity.user.User;
+import homework.homework2.exception.MappingException;
+import homework.homework2.service.FileService;
+import homework.homework2.service.SimpleCache;
+import homework.homework2.service.mapper.TaskMapper;
+import lombok.AllArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,17 +17,16 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Класс обеспечивает работу с фалом через консоль. Используется только для homework-2.
+ */
+@AllArgsConstructor
 public class SimpleShellProvider {
 
     private SimpleCache simpleCache;
     private FileService fileService;
     private TaskMapper taskMapper;
 
-    public SimpleShellProvider(SimpleCache simpleCache, FileService fileService, TaskMapper taskMapper) {
-        this.simpleCache = simpleCache;
-        this.fileService = fileService;
-        this.taskMapper = taskMapper;
-    }
 
     private static Pattern userTask = Pattern.compile("get\\s+userTask/\\d+", Pattern.CASE_INSENSITIVE);
     private static Pattern userSortTask = Pattern.compile("get\\s+userTaskSort/\\d+", Pattern.CASE_INSENSITIVE);

@@ -1,7 +1,8 @@
-package service;
+package homework.homework2.service;
 
-import entity.task.Task;
-import entity.user.User;
+import homework.homework2.entity.task.Task;
+import homework.homework2.entity.user.User;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Map;
  * Класс хранит закэшированные данный при маппинге файла, с сохранением ссылки на ообъект сущности.
  * Соответсвующий кэш сбрасывается при удалении записи из файла, и обновляется при добавлении записи в файл
  */
+@Component
 public class SimpleCache {
 
     private static Map<Long, User> userCache = new HashMap<>();

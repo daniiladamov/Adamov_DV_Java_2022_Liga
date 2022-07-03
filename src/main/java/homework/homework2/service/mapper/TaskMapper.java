@@ -53,8 +53,12 @@ public class TaskMapper implements SimpleMapper<Task> {
             Task taskInCache = simpleCache.getTask(idTemp);
             if (taskInCache != null && !update)
                 log.add(String.format("Задача с указанным id=%d уже создана:\n%s", idTemp, taskInCache));
-            else
-                id = idTemp;
+            else{
+                if (taskInCache==null&&update)
+                    log.add("Не существует задачи с id="+idTemp);
+                else
+                    id = idTemp;
+            }
         } catch (Exception ex) {
             log.add("Не удалось получить поле id из файла");
         }

@@ -9,7 +9,6 @@ import homework.homework2.service.FileService;
 import homework.homework2.service.SimpleCache;
 import homework.homework2.service.mapper.TaskMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +17,9 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Component
+/**
+ * Класс обеспечивает работу с фалом через консоль. Используется только для homework-2.
+ */
 @AllArgsConstructor
 public class SimpleShellProvider {
 

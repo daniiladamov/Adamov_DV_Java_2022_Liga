@@ -12,11 +12,11 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-public class SimpleController {
+public class CommandController {
     ExecutorFactory executorFactory;
 
     /**
-     * Допустпыне коммнады, передающиеся как параметры запроса по адресу http://localhost:8080/protoapi (пробелы в параметре
+     * Допустпыне коммнады, передающиеся как параметры запроса по адресу http://localhost:8080/command (пробелы в параметре
      * 'cmd' заменяются на символ '_'):
      * method=get&cmd=userTasks#X - отображается список задач пользователя с id=Х;
      * method=get&cmd=userTasksSort#X - отображается отсортированный список задач по статусу для пользователя с id=Х;
@@ -30,7 +30,7 @@ public class SimpleController {
      * method=end&cmd=clear - удалить все данные из соответсвующих файлов;
      * method=end&cmd=save - сохранить все изменения.
      */
-    @GetMapping("/protoapi")
+    @GetMapping("/command")
     public String responseForCommand(@RequestParam Map<String, String> commandMap) {
         String method = commandMap.get("method");
         CommandEnum commandEnum;

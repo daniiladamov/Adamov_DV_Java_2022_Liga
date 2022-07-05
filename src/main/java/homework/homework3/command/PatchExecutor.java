@@ -4,16 +4,19 @@ import homework.homework2.entity.EnumStatus;
 import homework.homework2.entity.task.Task;
 import homework.homework2.exception.MappingException;
 import homework.homework2.service.SimpleCache;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+@Component
+@AllArgsConstructor
 public class PatchExecutor extends AbstractCommandExecutor {
-    public PatchExecutor(String command, SimpleCache simpleCache) {
-        super(command, simpleCache);
-    }
+
+    private final SimpleCache simpleCache;
 
     @Override
-    public String executeCmd() {
+    public String executeCmd(String command) {
         String result = "Параметры запроса заданы неверно";
         if (changeTaskStatus.matcher(command).matches()) {
             try {

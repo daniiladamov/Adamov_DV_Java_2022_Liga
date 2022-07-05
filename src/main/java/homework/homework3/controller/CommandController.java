@@ -1,8 +1,7 @@
 package homework.homework3.controller;
 
 import homework.homework3.command.CommandEnum;
-import homework.homework3.command.CommandExecutor;
-import homework.homework3.service.ExecutorFactory;
+import homework.homework3.service.CommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +12,7 @@ import java.util.Map;
 @RestController
 @AllArgsConstructor
 public class CommandController {
-    ExecutorFactory executorFactory;
+    private final CommandService commandService;
 
     /**
      * Допустпыне коммнады, передающиеся как параметры запроса по адресу http://localhost:8080/command (пробелы в параметре
@@ -41,7 +40,6 @@ public class CommandController {
         }
         if (commandMap.get("cmd") == null)
             return "В запросе необходимо передать параметр 'cmd'";
-        CommandExecutor executor = executorFactory.getExecutor(commandEnum, commandMap.get("cmd"));
-        return executor.executeCmd();
+        return commandService.getMessage(commandEnum, commandMap.get("cmd"));
     }
 }

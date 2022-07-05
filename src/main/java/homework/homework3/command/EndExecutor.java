@@ -1,18 +1,16 @@
 package homework.homework3.command;
 
 import homework.homework2.service.FileService;
-import homework.homework2.service.SimpleCache;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@AllArgsConstructor
 public class EndExecutor extends AbstractCommandExecutor {
-    FileService fileService;
-
-    public EndExecutor(String command, SimpleCache simpleCache, FileService fileService) {
-        super(command, simpleCache);
-        this.fileService = fileService;
-    }
+    private final FileService fileService;
 
     @Override
-    public String executeCmd() {
+    public String executeCmd(String command) {
         if (command.matches("save")) {
             fileService.save();
             return "Изменения сохранены в соответсвующих файлах";

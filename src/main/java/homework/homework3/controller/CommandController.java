@@ -1,8 +1,7 @@
 package homework.homework3.controller;
 
 import homework.homework3.command.CommandEnum;
-import homework.homework3.command.CommandExecutor;
-import homework.homework3.service.ExecutorFactory;
+import homework.homework3.service.CommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,11 +11,11 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-public class SimpleController {
-    ExecutorFactory executorFactory;
+public class CommandController {
+    private final CommandService commandService;
 
     /**
-     * Допустпыне коммнады, передающиеся как параметры запроса по адресу http://localhost:8080/protoapi (пробелы в параметре
+     * Допустпыне коммнады, передающиеся как параметры запроса по адресу http://localhost:8080/command (пробелы в параметре
      * 'cmd' заменяются на символ '_'):
      * method=get&cmd=userTasks#X - отображается список задач пользователя с id=Х;
      * method=get&cmd=userTasksSort#X - отображается отсортированный список задач по статусу для пользователя с id=Х;
@@ -30,7 +29,7 @@ public class SimpleController {
      * method=end&cmd=clear - удалить все данные из соответсвующих файлов;
      * method=end&cmd=save - сохранить все изменения.
      */
-    @GetMapping("/protoapi")
+    @GetMapping("/command")
     public String responseForCommand(@RequestParam Map<String, String> commandMap) {
         String method = commandMap.get("method");
         CommandEnum commandEnum;
@@ -41,7 +40,6 @@ public class SimpleController {
         }
         if (commandMap.get("cmd") == null)
             return "В запросе необходимо передать параметр 'cmd'";
-        CommandExecutor executor = executorFactory.getExecutor(commandEnum, commandMap.get("cmd"));
-        return executor.executeCmd();
+        return commandService.getMessage(commandEnum, commandMap.get("cmd"));
     }
 }

@@ -2,29 +2,27 @@ package homework.homework2.service;
 
 import homework.homework2.service.mapper.TaskMapper;
 import homework.homework2.service.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class FileService {
-    private Path usersFile;
+    @Value("${files.users}")
+    private String usersPath;
+    @Value("${files.tasks}")
+    private String tasksPath;
+    private final SimpleCache simpleCache;
+    private final TaskMapper taskMapper;
+    private final UserMapper userMapper;
 
-    private Path tasksFile;
-    private SimpleCache simpleCache;
-    private TaskMapper taskMapper;
-    private UserMapper userMapper;
-
-    public FileService(@Qualifier("users")Path usersFile, @Qualifier("tasks")Path tasksFile, SimpleCache simpleCache,
-                       TaskMapper taskMapper, UserMapper userMapper) {
-        this.usersFile = usersFile;
-        this.tasksFile = tasksFile;
+    public FileService(SimpleCache simpleCache, TaskMapper taskMapper, UserMapper userMapper) {
         this.simpleCache = simpleCache;
         this.taskMapper = taskMapper;
         this.userMapper = userMapper;
@@ -32,19 +30,19 @@ public class FileService {
 
     public void clearAll() {
         boolean flag = true;
-        if (!Files.isWritable(usersFile)) {
-            System.err.println("Файл " + usersFile.getFileName() + " не досутпен для записи");
+        if (!Files.isWritable(Paths.get(usersPath))) {
+            System.err.println("Файл " + Paths.get(usersPath).getFileName() + " не досутпен для записи");
             flag = false;
         }
-        if (!Files.isWritable(tasksFile)) {
-            System.err.println("Файл " + tasksFile.getFileName() + " не досутпен для записи");
+        if (!Files.isWritable(Paths.get(tasksPath))) {
+            System.err.println("Файл " + Paths.get(tasksPath).getFileName() + " не досутпен для записи");
             flag = false;
         }
         if (!flag)
             return;
         try {
-            Files.writeString(usersFile, "");
-            Files.writeString(tasksFile, "");
+            Files.writeString(Paths.get(usersPath), "");
+            Files.writeString(Paths.get(tasksPath), "");
             simpleCache.removeCache();
         } catch (IOException e) {
             throw new RuntimeException();
@@ -55,23 +53,23 @@ public class FileService {
         List<String> tasks = taskMapper.mapToStringList(simpleCache.getTasks());
         List<String> users = userMapper.mapToStringList(simpleCache.getUsers());
         try {
-            Files.write(usersFile, users);
-            Files.write(tasksFile, tasks);
+            Files.write(Paths.get(usersPath), users);
+            Files.write(Paths.get(tasksPath), tasks);
             System.out.println("состояние сохранено");
         } catch (IOException e) {
             throw new RuntimeException();
         }
     }
+
     @PostConstruct
-    public void mappingFiles(){
+    private void mappingFiles() {
         try {
-            List<String> strings = Files.lines(usersFile).collect(Collectors.toList());
+            List<String> strings = Files.lines(Paths.get(usersPath)).collect(Collectors.toList());
             userMapper.mapToEntityList(strings);
 
-            List<String> stringsTasks = Files.lines(tasksFile).collect(Collectors.toList());
+            List<String> stringsTasks = Files.lines(Paths.get(tasksPath)).collect(Collectors.toList());
             taskMapper.mapToEntityList(stringsTasks);
-        }
-        catch (IOException ex){
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }

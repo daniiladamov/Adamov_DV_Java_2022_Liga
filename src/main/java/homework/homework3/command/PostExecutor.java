@@ -4,17 +4,17 @@ import homework.homework2.entity.task.Task;
 import homework.homework2.exception.MappingException;
 import homework.homework2.service.SimpleCache;
 import homework.homework2.service.mapper.TaskMapper;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@AllArgsConstructor
 public class PostExecutor extends AbstractCommandExecutor {
-    private TaskMapper taskMapper;
-
-    public PostExecutor(String command, SimpleCache simpleCache, TaskMapper taskMapper) {
-        super(command, simpleCache);
-        this.taskMapper = taskMapper;
-    }
+    private final TaskMapper taskMapper;
+    private final SimpleCache simpleCache;
 
     @Override
-    public String executeCmd() {
+    public String executeCmd(String command) {
         String lineToParse = command.replaceAll("_", " ");
         try {
             taskMapper.setUpdate(false);

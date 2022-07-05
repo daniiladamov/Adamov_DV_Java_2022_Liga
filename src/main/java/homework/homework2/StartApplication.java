@@ -25,6 +25,7 @@ public class StartApplication {
 
     /**
      * Точка входа в программу
+     *
      * @param args- если аргументы не передаются, работа идет с файлами по умолчаниями tasks.csv и users.csv,
      *              находящимися в директории src\main\resources.
      *              Если же аргументы передаются,то их должно быть два: первый - это абсолютный путь к файлу с
@@ -63,22 +64,22 @@ public class StartApplication {
                 List<String> stringsTasks = Files.lines(pathTask).collect(Collectors.toList());
                 taskMapper.mapToEntityList(stringsTasks);
 
-                FileService fileService = new FileService(pathUser, pathTask, simpleCache, taskMapper, userMapper);
+                FileService fileService = new FileService(simpleCache, taskMapper, userMapper);
                 return fileService;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else if (args.length == 0) {
             try {
-                Path pathUser = Paths.get("src\\main\\resources\\users.csv");
+                Path pathUser = Paths.get("src/main/resources/users.csv");
                 List<String> strings = Files.lines(pathUser).collect(Collectors.toList());
                 userMapper.mapToEntityList(strings);
 
-                Path pathTask = Paths.get("src\\main\\resources\\tasks.csv");
+                Path pathTask = Paths.get("src/main/resources/tasks.csv");
                 List<String> stringsTasks = Files.lines(pathTask).collect(Collectors.toList());
                 taskMapper.mapToEntityList(stringsTasks);
 
-                FileService fileService = new FileService(pathUser, pathTask, simpleCache, taskMapper, userMapper);
+                FileService fileService = new FileService(simpleCache, taskMapper, userMapper);
                 return fileService;
 
             } catch (IOException e) {

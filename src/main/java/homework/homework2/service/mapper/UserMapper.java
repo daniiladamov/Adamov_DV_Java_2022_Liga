@@ -27,10 +27,12 @@ public class UserMapper implements SimpleMapper<User> {
         if (line.isEmpty())
             return null;
         if (!pattern.matcher(line).matches())
-            throw new MappingException(String.format("формат строки не соответсвует требуемуму по ТЗ\n%s ", line));
+            throw new MappingException(String.format("Формат строки не соответсвует требуемуму\n%s ", line));
         String[] data = line.split(",");
         Long id = Long.parseLong(data[0]);
         String name = data[1];
+        if (simpleCache.getUser(id)!=null)
+            throw new MappingException(String.format("Пользователь с id=%d уже создан",id));
         User user = new User(id, name);
         simpleCache.addUser(user);
         return user;

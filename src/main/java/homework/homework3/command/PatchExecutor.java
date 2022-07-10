@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static homework.homework3.util.MessageEnum.ERROR_RESULT;
 import static homework.homework3.util.MessageEnum.STATUS_ERROR;
 import static homework.homework3.util.PatternEnum.CHANGE_TASK_STATUS;
 
@@ -20,7 +21,7 @@ public class PatchExecutor implements CommandExecutor {
 
     @Override
     public String executeCmd(String command) {
-        String result = "Параметры запроса заданы неверно";
+        String result = ERROR_RESULT.getMessage();
         if (CHANGE_TASK_STATUS.getPattern().matcher(command).matches()) {
             try {
                 result = patchTaskStatus(command);

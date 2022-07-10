@@ -65,7 +65,7 @@ public class GetExecutor implements CommandExecutor {
         if (userFind == null)
             throw new MappingException(String.format("User c id=%d не существует", id));
         else if (userFind.getTaskList().size() == 0)
-            throw new MappingException(String.format("У User c id=%d нет назначенных задач", id));
+            throw new MappingException(String.format("У User c id=%d нет назначенных задач", userFind.getId()));
         else {
             if (needSort)
                 return userFind.getTaskList().stream().sorted(new TaskComparator()).map(x -> x.toString())

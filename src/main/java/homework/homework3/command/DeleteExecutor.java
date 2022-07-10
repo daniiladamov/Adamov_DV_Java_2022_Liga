@@ -5,6 +5,7 @@ import homework.homework2.service.SimpleCache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import static homework.homework3.util.MessageEnum.ERROR_RESULT;
 import static homework.homework3.util.PatternEnum.TASK_BY_ID;
 
 @Component
@@ -14,7 +15,6 @@ public class DeleteExecutor implements CommandExecutor{
 
     @Override
     public String executeCmd(String command) {
-        String result = "Параметры запроса заданы неверно";
         if (TASK_BY_ID.getPattern().matcher(command).matches()) {
             Long id;
             try {
@@ -31,6 +31,6 @@ public class DeleteExecutor implements CommandExecutor{
             }
 
         }
-        return result;
+        return ERROR_RESULT.getMessage();
     }
 }

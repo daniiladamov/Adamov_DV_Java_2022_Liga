@@ -5,42 +5,45 @@ import homework.homework2.entity.task.TaskComparator;
 import homework.homework2.entity.user.User;
 import homework.homework2.exception.MappingException;
 import homework.homework2.service.SimpleCache;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+import static homework.homework3.util.MessageEnum.ERROR_RESULT;
+import static homework.homework3.util.PatternEnum.*;
+
 @Component
-@AllArgsConstructor
-public class GetExecutor extends AbstractCommandExecutor {
+@RequiredArgsConstructor
+public class GetExecutor implements CommandExecutor {
 
     private final SimpleCache simpleCache;
 
 
     @Override
     public String executeCmd(String command) {
-        if (userTasks.matcher(command).matches()) {
+        if (USER_TASKS.getPattern().matcher(command).matches()) {
             try {
                 return getUserTask(false, command);
             } catch (MappingException e) {
                 return e.getMessage();
             }
         }
-        if (userTasksSort.matcher(command).matches()) {
+        if (USER_TASKS_SORT.getPattern().matcher(command).matches()) {
             try {
                 return getUserTask(true, command);
             } catch (MappingException e) {
                 return e.getMessage();
             }
         }
-        if (taskById.matcher(command).matches()) {
+        if (TASK_BY_ID.getPattern().matcher(command).matches()) {
             try {
                 return getTaskById(command);
             } catch (MappingException e) {
                 return e.getMessage();
             }
         }
-        return errorResult;
+        return ERROR_RESULT.getMessage();
     }
 
     private String getUserTask(boolean needSort, String command) throws MappingException {

@@ -2,18 +2,20 @@ package homework.homework3.command;
 
 import homework.homework2.entity.task.Task;
 import homework.homework2.service.SimpleCache;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import static homework.homework3.util.PatternEnum.TASK_BY_ID;
+
 @Component
-@AllArgsConstructor
-public class DeleteExecutor extends AbstractCommandExecutor {
+@RequiredArgsConstructor
+public class DeleteExecutor implements CommandExecutor{
     private final SimpleCache simpleCache;
 
     @Override
     public String executeCmd(String command) {
         String result = "Параметры запроса заданы неверно";
-        if (taskById.matcher(command).matches()) {
+        if (TASK_BY_ID.getPattern().matcher(command).matches()) {
             Long id;
             try {
                 id = Long.parseLong(command.replaceAll("task#", ""));

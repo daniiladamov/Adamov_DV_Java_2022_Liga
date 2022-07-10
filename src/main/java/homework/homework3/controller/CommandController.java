@@ -1,16 +1,17 @@
 package homework.homework3.controller;
 
-import homework.homework3.command.CommandEnum;
 import homework.homework3.service.CommandService;
-import lombok.AllArgsConstructor;
+import homework.homework3.util.CommandEnum;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommandController {
     private final CommandService commandService;
 
@@ -38,8 +39,10 @@ public class CommandController {
         } catch (IllegalArgumentException ex) {
             commandEnum = CommandEnum.BAD;
         }
-        if (commandMap.get("cmd") == null)
+        Optional<String> cmd = Optional.ofNullable(commandMap.get("cmd"));
+        if (cmd.isEmpty())
             return "В запросе необходимо передать параметр 'cmd'";
-        return commandService.getMessage(commandEnum, commandMap.get("cmd"));
+        else
+            return commandService.getMessage(commandEnum, cmd.get());
     }
 }

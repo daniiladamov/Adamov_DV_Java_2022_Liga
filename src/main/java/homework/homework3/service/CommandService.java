@@ -1,11 +1,12 @@
 package homework.homework3.service;
 
 import homework.homework3.command.*;
-import lombok.AllArgsConstructor;
+import homework.homework3.util.CommandEnum;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommandService {
     private final GetExecutor getExecutor;
     private final PatchExecutor patchExecutor;

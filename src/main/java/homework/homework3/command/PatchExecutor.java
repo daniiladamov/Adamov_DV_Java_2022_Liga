@@ -4,21 +4,24 @@ import homework.homework2.entity.EnumStatus;
 import homework.homework2.entity.task.Task;
 import homework.homework2.exception.MappingException;
 import homework.homework2.service.SimpleCache;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static homework.homework3.util.MessageEnum.STATUS_ERROR;
+import static homework.homework3.util.PatternEnum.CHANGE_TASK_STATUS;
+
 @Component
-@AllArgsConstructor
-public class PatchExecutor extends AbstractCommandExecutor {
+@RequiredArgsConstructor
+public class PatchExecutor implements CommandExecutor {
 
     private final SimpleCache simpleCache;
 
     @Override
     public String executeCmd(String command) {
         String result = "Параметры запроса заданы неверно";
-        if (changeTaskStatus.matcher(command).matches()) {
+        if (CHANGE_TASK_STATUS.getPattern().matcher(command).matches()) {
             try {
                 result = patchTaskStatus(command);
             } catch (MappingException e) {
@@ -46,7 +49,7 @@ public class PatchExecutor extends AbstractCommandExecutor {
                             .equalsIgnoreCase(split[1].replace("_", " ")))
                     .findFirst().orElse(null);
             if (status == null)
-                throw new MappingException(statusError);
+                throw new MappingException(STATUS_ERROR.getMessage());
             else {
                 taskFind.setStatus(status);
                 return String.format("Статус задачи c id=%d был изменен на '%s'", id, status.getStatus());

@@ -2,16 +2,14 @@ package homework.homework3.command;
 
 import homework.homework2.entity.task.Task;
 import homework.homework2.exception.MappingException;
-import homework.homework2.service.SimpleCache;
 import homework.homework2.service.mapper.TaskMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
-public class PutExecutor extends AbstractCommandExecutor {
+@RequiredArgsConstructor
+public class PutExecutor implements CommandExecutor{
     private final TaskMapper taskMapper;
-    private final SimpleCache simpleCache;
 
     @Override
     public String executeCmd(String command) {

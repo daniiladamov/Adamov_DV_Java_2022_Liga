@@ -7,6 +7,7 @@ import homework.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ import static homework.util.PatternEnum.CHANGE_TASK_STATUS;
 public class PatchExecutor implements CommandExecutor {
     private final TaskService taskService;
     @Override
+    @Transactional
     public String executeCmd(String command) {
         String result = ERROR_RESULT.getMessage();
         if (CHANGE_TASK_STATUS.getPattern().matcher(command).matches()) {

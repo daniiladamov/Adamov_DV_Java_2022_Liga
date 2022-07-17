@@ -6,12 +6,15 @@ import homework.mapper.TaskMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+
 @Component
 @RequiredArgsConstructor
 public class PostExecutor implements CommandExecutor {
     private final TaskMapper taskMapper;
 
     @Override
+    @Transactional
     public String executeCmd(String command) {
         String lineToParse = command.replaceAll("_", " ");
         try {

@@ -1,15 +1,18 @@
 package homework.command;
 
+import homework.entity.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
-import homework.service.SimpleCache;
+import homework.service.TaskService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Optional;
 
 import static homework.util.MessageEnum.ERROR_RESULT;
 import static homework.util.MessageEnum.STATUS_ERROR;
@@ -17,20 +20,26 @@ import static homework.util.MessageEnum.STATUS_ERROR;
 class PatchExecutorTest {
     PatchExecutor patchExecutor;
     @Mock
-    private SimpleCache simpleCache;
+    private TaskService taskService;
     private String cmd="task#1;status#в_работе";
-    private User user=new User(1L,null);
-    private Task task=new Task(1L,null,null,user, LocalDate.now());
+    private User user=new User();
+    private Task task=new Task();
 
     public PatchExecutorTest() {
+        user.setId(1L);
+        task.setId(1L);
+        task.setUser(user);
+        task.setDate(Calendar.getInstance());
+        task.setStatus(EnumStatus.EMPTY);
         MockitoAnnotations.openMocks(this);
+        user.setTaskList(new ArrayList<>());
         user.addTask(task);
-        patchExecutor=new PatchExecutor(simpleCache);
+        patchExecutor=new PatchExecutor(taskService);
     }
 
     @Test
     void executeCmd_ChangeTaskStatus_ExpectedBehavior(){
-        Mockito.when(simpleCache.getTask(1L)).thenReturn(task);
+        Mockito.when(taskService.getTask(1L)).thenReturn(Optional.ofNullable(task));
         String result = patchExecutor.executeCmd(cmd);
         Assertions.assertEquals(String.format("Статус задачи c id=%d был изменен на '%s'", task.getId()
                 ,task.getStatus().getStatus()),result);
@@ -38,7 +47,7 @@ class PatchExecutorTest {
 
     @Test
     void executeCmd_ChangeTaskStatus_NotFind_or_WrongValue() {
-        Mockito.when(simpleCache.getTask(1L)).thenReturn(null);
+        Mockito.when(taskService.getTask(1L)).thenReturn(Optional.ofNullable(null));
         String result = patchExecutor.executeCmd(cmd);
         Assertions.assertEquals("Task c id=1 не существует",result);
 
@@ -48,7 +57,7 @@ class PatchExecutorTest {
 
     @Test
     void executeCmd_ChangeTaskStatus_IncorrectStatus() {
-        Mockito.when(simpleCache.getTask(1L)).thenReturn(task);
+        Mockito.when(taskService.getTask(1L)).thenReturn(Optional.ofNullable(task));
         String result = patchExecutor.executeCmd("task#1;status#вработе");
         Assertions.assertEquals(STATUS_ERROR.getMessage(),result);
     }

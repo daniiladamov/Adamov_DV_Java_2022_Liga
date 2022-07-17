@@ -4,10 +4,12 @@ import homework.entity.task.Task;
 import homework.entity.task.TaskComparator;
 import homework.entity.user.User;
 import homework.exception.MappingException;
-import homework.service.SimpleCache;
+import homework.service.TaskService;
+import homework.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static homework.util.MessageEnum.ERROR_RESULT;
@@ -17,7 +19,8 @@ import static homework.util.PatternEnum.*;
 @RequiredArgsConstructor
 public class GetExecutor implements CommandExecutor {
 
-    private final SimpleCache simpleCache;
+    private final TaskService taskService;
+    private final UserService userService;
 
 
     @Override
@@ -61,17 +64,19 @@ public class GetExecutor implements CommandExecutor {
                 throw new MappingException("в качестве id необходимо передавать число");
             }
         }
-        User userFind = simpleCache.getUser(id);
-        if (userFind == null)
+        Optional<User> userFind = userService.getUser(id);
+        if (userFind.isEmpty())
             throw new MappingException(String.format("User c id=%d не существует", id));
-        else if (userFind.getTaskList().size() == 0)
-            throw new MappingException(String.format("У User c id=%d нет назначенных задач", userFind.getId()));
         else {
+            User user=userFind.get();
+            if (user.getTaskList().size() == 0)
+                throw new MappingException(String.format("У User c id=%d нет назначенных задач"
+                        , user.getId()));
             if (needSort)
-                return userFind.getTaskList().stream().sorted(new TaskComparator()).map(x -> x.toString())
+                return user.getTaskList().stream().sorted(new TaskComparator()).map(x -> x.toString())
                         .collect(Collectors.joining("\n"));
             else
-                return userFind.getTaskList().stream().map(x -> x.toString()).collect(Collectors.joining("\n"));
+                return user.getTaskList().stream().map(x -> x.toString()).collect(Collectors.joining("\n"));
         }
     }
 
@@ -82,10 +87,10 @@ public class GetExecutor implements CommandExecutor {
         } catch (NumberFormatException ex) {
             throw new MappingException("в качестве id необходимо передавать число");
         }
-        Task task = simpleCache.getTask(id);
-        if (task == null)
+        Optional<Task> task = taskService.getTask(id);
+        if (task.isEmpty())
             throw new MappingException(String.format("Task c id=%d не существует", id));
         else
-            return task.toString();
+            return task.get().toString();
     }
 }

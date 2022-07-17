@@ -15,7 +15,6 @@ public class PostExecutor implements CommandExecutor {
     public String executeCmd(String command) {
         String lineToParse = command.replaceAll("_", " ");
         try {
-            taskMapper.setUpdate(false);
             Task task = taskMapper.mapToNewEntity(lineToParse);
             return "Создана Task c id=" + task.getId();
         } catch (MappingException e) {

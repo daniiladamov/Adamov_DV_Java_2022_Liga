@@ -32,6 +32,4 @@ public interface SimpleMapper<T> {
         }
         return resultList;
     }
-
-
 }

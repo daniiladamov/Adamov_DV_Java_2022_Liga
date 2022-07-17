@@ -10,22 +10,32 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
 
 class PostExecutorTest {
     @Mock
     private TaskMapper taskMapper;
     @Mock
     private PostExecutor postExecutor;
-    private User user=new User(1L,null);
-    private Task task=new Task(1L,null,null,user, LocalDate.now());
+    private User user=new User();
+    private Task task=new Task();
     private String cmd="Задание,Описание Задания,1,10.07.2022";
-    private String acceptResult="Создана Task c id=" + task.getId();
+    private String acceptResult;
     private MappingException mappingException=new MappingException("исключение");
 
     public PostExecutorTest() {
+        user.setId(1L);
+        task.setId(1L);
+        task.setUser(user);
+        task.setDate(Calendar.getInstance());
         MockitoAnnotations.openMocks(this);
+        user.setTaskList(new ArrayList<>());
+        user.addTask(task);
         postExecutor=new PostExecutor(taskMapper);
+        acceptResult="Создана Task c id=" + task.getId();
     }
 
     @Test

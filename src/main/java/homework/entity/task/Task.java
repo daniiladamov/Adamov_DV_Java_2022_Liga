@@ -2,39 +2,41 @@ package homework.entity.task;
 
 import homework.entity.EnumStatus;
 import homework.entity.user.User;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.persistence.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 @Getter
 @Setter
+@Entity
+@Table(name="tasks")
+@NoArgsConstructor
+@EqualsAndHashCode
 public class Task {
-    private static Long maxIdValue = 0L;
-    private final Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "title")
     private String title;
+    @Column(name = "description")
     private String description;
-    private EnumStatus status = EnumStatus.EMPTY;
-    private LocalDate date;
+    @Enumerated(EnumType.STRING)
+    @Column(name="status",columnDefinition = "varchar(255) default 'EMPTY'")
+    private EnumStatus status;
+    @Column(name="task_date")
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd.MM.yyyy")
+    private Calendar date;
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
-
-    public Task(Long id, String title, String description, User user, LocalDate date) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.user = user;
-        this.date = date;
-        if (id > maxIdValue)
-            maxIdValue = id;
-    }
-
-    public static Long getGlobalId() {
-        return ++maxIdValue;
-    }
 
     @Override
     public String toString() {
@@ -43,17 +45,9 @@ public class Task {
                 ", title='" + title + "'" +
                 ", description='" + description + "'" +
                 ", status=" + status.getStatus() +
-                ", date=" + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
-                ", user=" + user.getName();
-    }
-
-    public String toFileFormat() {
-        List<String> resultList = new ArrayList<>(
-                List.of(getId().toString(), getTitle(), getDescription(), getUser().getId().toString(),
-                        getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
-        );
-        if (!status.equals(EnumStatus.EMPTY))
-            resultList.add(status.getStatus());
-        return resultList.stream().collect(Collectors.joining(","));
+//                ", date=" + date.format(DateTimeFormatter.ofPattern()) +
+                ", date=" + new SimpleDateFormat("dd.MM.yyyy").format(date.getTime())
+                + ", user=" + user.getName()
+                ;
     }
 }

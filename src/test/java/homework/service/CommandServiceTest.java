@@ -23,14 +23,12 @@ class CommandServiceTest {
     @Mock
     private PutExecutor putExecutor;
     @Mock
-    private EndExecutor endExecutor;
-    @Mock
     private CommandExecutor badExecutor;
 
     public CommandServiceTest(){
         MockitoAnnotations.openMocks(this);
         commandService=new CommandService(getExecutor,patchExecutor,postExecutor,deleteExecutor,putExecutor
-                ,endExecutor,badExecutor);
+                ,badExecutor);
     }
 
     @Test
@@ -44,7 +42,6 @@ class CommandServiceTest {
         Mockito.verify(putExecutor,Mockito.times(1)).executeCmd(testMessage);
         Mockito.verify(postExecutor,Mockito.times(1)).executeCmd(testMessage);
         Mockito.verify(deleteExecutor,Mockito.times(1)).executeCmd(testMessage);
-        Mockito.verify(endExecutor,Mockito.times(1)).executeCmd(testMessage);
         Mockito.verify(badExecutor,Mockito.times(1)).executeCmd(testMessage);
     }
 

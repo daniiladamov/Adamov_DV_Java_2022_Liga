@@ -1,37 +1,49 @@
 package homework.command;
 
+import homework.entity.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
-import homework.service.SimpleCache;
+import homework.service.TaskService;
+import homework.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Optional;
 
 import static homework.util.MessageEnum.ERROR_RESULT;
 
 class GetExecutorTest {
     @Mock
-    private SimpleCache simpleCache;
+    private TaskService taskService;
+    @Mock
+    private UserService userService;
     private String cmdGetUserTasks="userTasks#1";
     private String cmdGetUserTasksSort="userTasksSort#1";
     private String cmdTaskById="task#1";
     private GetExecutor getExecutor;
-    private User user=new User(1L,null);
-    private Task task=new Task(1L,null,null,user, LocalDate.now());
+    private User user=new User();
+    private Task task=new Task();
 
     public GetExecutorTest() {
+        user.setId(1L);
+        task.setId(1L);
+        task.setUser(user);
+        task.setDate(Calendar.getInstance());
+        task.setStatus(EnumStatus.EMPTY);
         MockitoAnnotations.openMocks(this);
+        user.setTaskList(new ArrayList<>());
         user.addTask(task);
-        getExecutor=new GetExecutor(simpleCache);
+        getExecutor=new GetExecutor(taskService,userService);
     }
 
     @Test
     void executeCmd_GetUserTasks_ExpectedBehavior() {
-        Mockito.when(simpleCache.getUser(1L)).thenReturn(user);
+        Mockito.when(userService.getUser(1L)).thenReturn(Optional.ofNullable(user));
         String result = getExecutor.executeCmd(cmdGetUserTasks);
         Assertions.assertEquals(user.getTaskList().get(0).toString(),result);
     }
@@ -48,22 +60,24 @@ class GetExecutorTest {
 
     @Test
     void executeCmd_GetUserTasks_EmptyTaskList() {
-        User userEmpty=new User(2L,null);
-        Mockito.when(simpleCache.getUser(1L)).thenReturn(userEmpty);
+        User userEmpty=new User();
+        userEmpty.setId(2L);
+        userEmpty.setTaskList(new ArrayList<>());
+        Mockito.when(userService.getUser(1L)).thenReturn(Optional.of(userEmpty));
         String result = getExecutor.executeCmd(cmdGetUserTasks);
         Assertions.assertEquals(String.format("У User c id=%d нет назначенных задач", userEmpty.getId()),result);
     }
 
     @Test
     void executeCmd_GetTaskById_ExpectedBehavior() {
-        Mockito.when(simpleCache.getTask(1L)).thenReturn(task);
+        Mockito.when(taskService.getTask(1L)).thenReturn(Optional.ofNullable(task));
         String s = getExecutor.executeCmd(cmdTaskById);
         Assertions.assertEquals(task.toString(),s);
     }
 
     @Test
     void executeCmd_GetTaskById_NotFind_Or_WrongValue() {
-        Mockito.when(simpleCache.getTask(1L)).thenReturn(null);
+        Mockito.when(taskService.getTask(1L)).thenReturn(Optional.ofNullable(null));
         String taskNotFind = getExecutor.executeCmd(cmdTaskById);
         String wrongCommand="task#123k";
         String error=getExecutor.executeCmd(wrongCommand);
@@ -74,7 +88,7 @@ class GetExecutorTest {
 
     @Test
     void executeCmd_GetUserTasksSort_ExpectedBehavior() {
-        Mockito.when(simpleCache.getUser(1L)).thenReturn(user);
+        Mockito.when(userService.getUser(1L)).thenReturn(Optional.ofNullable(user));
         String result = getExecutor.executeCmd(cmdGetUserTasksSort);
         Assertions.assertEquals(user.getTaskList().get(0).toString(),result);
     }
@@ -91,8 +105,10 @@ class GetExecutorTest {
 
     @Test
     void executeCmd_GetUserTasksSort_EmptyTaskList() {
-        User userEmpty=new User(2L,null);
-        Mockito.when(simpleCache.getUser(1L)).thenReturn(userEmpty);
+        User userEmpty=new User();
+        userEmpty.setId(2L);
+        userEmpty.setTaskList(new ArrayList<>());
+        Mockito.when(userService.getUser(1L)).thenReturn(Optional.of(userEmpty));
         String result = getExecutor.executeCmd(cmdGetUserTasksSort);
         Assertions.assertEquals(String.format("У User c id=%d нет назначенных задач", userEmpty.getId()),result);
     }

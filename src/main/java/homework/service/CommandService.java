@@ -13,7 +13,6 @@ public class CommandService {
     private final PostExecutor postExecutor;
     private final DeleteExecutor deleteExecutor;
     private final PutExecutor putExecutor;
-    private final EndExecutor endExecutor;
     private final CommandExecutor badExecutor;
 
     public String getMessage(CommandEnum commandEnum, String command) {
@@ -36,9 +35,6 @@ public class CommandService {
                     break;
                 case PUT:
                     commandExecutor = putExecutor;
-                    break;
-                case END:
-                    commandExecutor = endExecutor;
                     break;
                 case BAD:
                     commandExecutor = badExecutor;

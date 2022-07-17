@@ -1,9 +1,11 @@
 package homework.command;
 
 import homework.entity.task.Task;
-import homework.service.SimpleCache;
+import homework.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 import static homework.util.MessageEnum.ERROR_RESULT;
 import static homework.util.PatternEnum.TASK_BY_ID;
@@ -11,7 +13,7 @@ import static homework.util.PatternEnum.TASK_BY_ID;
 @Component
 @RequiredArgsConstructor
 public class DeleteExecutor implements CommandExecutor{
-    private final SimpleCache simpleCache;
+    private final TaskService taskService;
 
     @Override
     public String executeCmd(String command) {
@@ -22,12 +24,15 @@ public class DeleteExecutor implements CommandExecutor{
             } catch (NumberFormatException ex) {
                 return "в качестве id необходимо передавать число";
             }
-            Task task = simpleCache.getTask(id);
-            if (task == null)
+            Optional<Task> task = taskService.getTask(id);
+            if (task.isEmpty())
                 return String.format("Task c id=%d не существует", id);
             else {
-                simpleCache.removeTask(id);
-                return String.format("Задача с id=%d была удалена.\n" + task, id);
+                boolean deleteFlag = taskService.removeTask(id);
+                if (deleteFlag)
+                    return String.format("Задача с id=%d была удалена.\n" + task.get(), id);
+                else
+                    return String.format("Задача с id=%d не была найдена.", id);
             }
 
         }

@@ -14,7 +14,6 @@ public class PutExecutor implements CommandExecutor{
     @Override
     public String executeCmd(String command) {
         String parse = command.replaceAll("_", " ");
-        taskMapper.setUpdate(true);
         try {
             Task task = taskMapper.mapToEntity(parse);
             return "Задача обновлена:\n" + task;

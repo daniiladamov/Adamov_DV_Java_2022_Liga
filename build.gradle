@@ -25,15 +25,22 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-    implementation 'junit:junit:4.13.1'
-    implementation 'junit:junit:4.13.1'
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    implementation 'junit:junit:4.13.2'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'org.modelmapper:modelmapper:3.1.0'
+    annotationProcessor("javax.xml.bind:jaxb-api")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen")
 
 }
+sourceSets.main.java.srcDirs += "${buildDir}/generated"
 
+compileJava {
+    options.annotationProcessorGeneratedSourcesDirectory = file("${buildDir}/generated")
+}
 tasks.named('test') {
     useJUnitPlatform()
 }

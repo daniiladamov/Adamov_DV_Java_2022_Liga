@@ -1,7 +1,9 @@
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
-    url: jdbc:postgresql://db:5432/testdb
-#    url: jdbc:postgresql://localhost:5423/testdb
+    url: jdbc:postgresql://localhost:5432/testdb
     username: postgres
     password: root
     driver-class-name: org.postgresql.Driver

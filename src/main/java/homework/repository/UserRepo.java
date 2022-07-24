@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepo extends JpaRepository<User, Long> {
+public interface UserRepo extends JpaRepository<User, Long>{
     @Override
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
             attributePaths ={"taskList"} )

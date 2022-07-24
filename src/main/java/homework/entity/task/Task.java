@@ -45,7 +45,6 @@ public class Task {
                 ", title='" + title + "'" +
                 ", description='" + description + "'" +
                 ", status=" + status.getStatus() +
-//                ", date=" + date.format(DateTimeFormatter.ofPattern()) +
                 ", date=" + new SimpleDateFormat("dd.MM.yyyy").format(date.getTime())
                 + ", user=" + user.getName()
                 ;

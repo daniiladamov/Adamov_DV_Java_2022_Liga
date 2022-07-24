@@ -10,4 +10,4 @@ insert into tasks (title,description,user_id,task_date,status) values ('ДЗ','C
 ('домашка','написать хоть сколько-либо кода',3,'2022-06-22','NEW'),
 ('домашка','написать что не смог написать',2,'2022-06-22','IN_PROGRESS');
 
-insert into tasks (title,description,user_id,task_date) values('домашка','написать хоть что-то',3,'2022-06-22');
+insert into tasks (title,description,user_id,task_date) values('домашка','написать хоть что-то',3,'2022-07-22');

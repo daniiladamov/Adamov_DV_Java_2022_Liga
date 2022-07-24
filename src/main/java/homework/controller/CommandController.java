@@ -1,19 +1,31 @@
 package homework.controller;
 
+import homework.entity.task.TaskDto;
+import homework.entity.task.TaskFilter;
 import homework.service.CommandService;
+import homework.service.TaskService;
 import homework.util.CommandEnum;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class CommandController {
     private final CommandService commandService;
+    private final TaskService taskService;
+    private final ModelMapper modelMapper;
 
     /**
      * Допустпыне коммнады, передающиеся как параметры запроса по адресу http://localhost:8080/command (пробелы в параметре
@@ -45,4 +57,34 @@ public class CommandController {
         else
             return commandService.getMessage(commandEnum, cmd.get());
     }
+
+    /**
+     * Эндпоинт для homework-9. Тестировать можно по адресу: http://localhost:8080/swagger-ui/#
+     * @param taskFilter объект передается в качестве параметров запроса. Используется для фильтрации
+     *                   полученного списка задач по статусу и интервалу дат.
+     *                   ВАЖНО: дата передается в формате dd-MM-yyyy.
+     * @return  список задачи пользователя с наибольшим количеством задач. Опционально моежт быть отфильтрован.
+     */
+    @GetMapping("/tasks")
+    public ResponseEntity<List<TaskDto>> getTaskMaxCount(TaskFilter taskFilter){
+        return new ResponseEntity<>(taskService.getTaskMaxCount(taskFilter).stream().
+                map(task->modelMapper.map(task, TaskDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+    }
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity getException(){
+        return new ResponseEntity("Необходимо передавать дату в формате dd-MM-yyyy",
+                HttpStatus.I_AM_A_TEAPOT);
+    }
+
+//    @GetMapping("/tasks")
+//    public ResponseEntity<Page<TaskDto>>getTasks(TaskPage taskPage){
+//        return new ResponseEntity<>(getOtjectToDto(taskService.getPages(taskPage)), HttpStatus.OK);
+//    }
+//
+//    private Page<TaskDto> getOtjectToDto(Page<Task> tasksPage){
+//        List<TaskDto> collect = tasksPage.getContent().stream().map(task -> modelMapper.map(task, TaskDto.class))
+//                .collect(Collectors.toList());
+//        return new PageImpl<>(collect,tasksPage.getPageable(), tasksPage.getTotalElements());
+//    }
+
 }

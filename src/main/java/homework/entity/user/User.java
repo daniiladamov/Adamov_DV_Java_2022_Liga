@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -35,8 +37,10 @@ public class User {
     @Column(name="password")
     private String password;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Task> taskList=new ArrayList<>();
     @ManyToMany(mappedBy = "users")
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Project> projects=new HashSet<>();
 
     public void addTask(Task task) {

@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -45,6 +47,7 @@ public class Task {
     @JoinColumn(name="project_id",referencedColumnName = "id")
     private Project project;
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Comment> comment=new HashSet<>();
 
     @Override

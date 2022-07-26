@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -31,7 +33,9 @@ public class Project {
             joinColumns = @JoinColumn(name="project_id"),
             inverseJoinColumns = @JoinColumn(name ="user_id")
     )
+    @Fetch(FetchMode.SUBSELECT)
     private Set<User> users=new HashSet<>();
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Task> tasks=new HashSet<>();
 }

@@ -1,4 +1,4 @@
-package homework.entity;
+package homework.util;
 
 public enum EnumStatus {
     NEW("новое"), IN_PROGRESS("в работе"), READY("готово"), EMPTY("не задано");

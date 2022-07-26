@@ -1,11 +1,11 @@
 package homework.mapper;
 
-import homework.entity.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import homework.exception.MappingException;
 import homework.service.TaskService;
 import homework.service.UserService;
+import homework.util.EnumStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ class TaskMapperTest {
 
     public TaskMapperTest() {
         user.setId(1L);
-        user.setName("Иван");
+        user.setFirstName("Иван");
         task.setId(1L);
         task.setUser(user);
         task.setTitle("ДЗ");
@@ -40,7 +39,6 @@ class TaskMapperTest {
         task.setDate(GregorianCalendar.from(LocalDate.parse("26.09.2022", DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                 .atStartOfDay(ZoneId.systemDefault())));
         MockitoAnnotations.openMocks(this);
-        user.setTaskList(new ArrayList<>());
         user.addTask(task);
         taskMapper=new TaskMapper(taskService,userService);
     }

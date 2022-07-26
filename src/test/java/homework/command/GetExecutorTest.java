@@ -1,10 +1,10 @@
 package homework.command;
 
-import homework.entity.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import homework.service.TaskService;
 import homework.service.UserService;
+import homework.util.EnumStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -36,7 +36,6 @@ class GetExecutorTest {
         task.setDate(Calendar.getInstance());
         task.setStatus(EnumStatus.EMPTY);
         MockitoAnnotations.openMocks(this);
-        user.setTaskList(new ArrayList<>());
         user.addTask(task);
         getExecutor=new GetExecutor(taskService,userService);
     }

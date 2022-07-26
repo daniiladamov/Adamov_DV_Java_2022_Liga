@@ -1,7 +1,7 @@
 package homework.service;
 
 import com.sun.istack.NotNull;
-import homework.entity.EnumStatus;
+import homework.util.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.task.TaskFilter;
 import homework.entity.task.Task_;

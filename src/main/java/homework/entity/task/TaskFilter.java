@@ -1,6 +1,6 @@
 package homework.entity.task;
 
-import homework.entity.EnumStatus;
+import homework.util.EnumStatus;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,6 +1,5 @@
 package homework.util;
 
-import homework.entity.EnumStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

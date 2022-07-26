@@ -1,6 +1,6 @@
 package homework.command;
 
-import homework.entity.EnumStatus;
+import homework.util.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import homework.exception.MappingException;

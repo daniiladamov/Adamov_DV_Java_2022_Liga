@@ -1,6 +1,8 @@
 package homework.entity.task;
 
-import homework.entity.EnumStatus;
+import homework.util.EnumStatus;
+import homework.entity.comment.Comment;
+import homework.entity.project.Project;
 import homework.entity.user.User;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,6 +13,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,9 +38,14 @@ public class Task {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd.MM.yyyy")
     private Calendar date;
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
+    @ManyToOne
+    @JoinColumn(name="project_id",referencedColumnName = "id")
+    private Project project;
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Comment> comment=new HashSet<>();
 
     @Override
     public String toString() {
@@ -46,7 +55,6 @@ public class Task {
                 ", description='" + description + "'" +
                 ", status=" + status.getStatus() +
                 ", date=" + new SimpleDateFormat("dd.MM.yyyy").format(date.getTime())
-                + ", user=" + user.getName()
-                ;
+                + ", user=" + user.getFirstName();
     }
 }

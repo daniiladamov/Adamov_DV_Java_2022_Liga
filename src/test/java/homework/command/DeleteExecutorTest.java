@@ -1,16 +1,15 @@
 package homework.command;
 
-import homework.entity.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import homework.service.TaskService;
+import homework.util.EnumStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Optional;
 
@@ -31,7 +30,6 @@ class DeleteExecutorTest {
         task.setDate(Calendar.getInstance());
         task.setStatus(EnumStatus.EMPTY);
         MockitoAnnotations.openMocks(this);
-        user.setTaskList(new ArrayList<>());
         user.addTask(task);
         deleteExecutor=new DeleteExecutor(taskService);
     }

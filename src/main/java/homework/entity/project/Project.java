@@ -1,5 +1,6 @@
 package homework.entity.project;
 
+import com.sun.istack.NotNull;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import lombok.EqualsAndHashCode;
@@ -24,8 +25,10 @@ public class Project {
     @Column(name = "id")
     private Long id;
     @Column(name = "title")
+    @NotNull
     private String title;
     @Column(name = "description")
+    @NotNull
     private String description;
     @ManyToMany
     @JoinTable(

@@ -1,5 +1,6 @@
 package homework.entity.comment;
 
+import com.sun.istack.NotNull;
 import homework.entity.task.Task;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,8 +20,10 @@ public class Comment {
     @Column(name = "id")
     private Long id;
     @Column(name = "content")
+    @NotNull
     private String content;
     @ManyToOne
     @JoinColumn(name="task_id",referencedColumnName = "id")
+    @NotNull
     private Task task;
 }

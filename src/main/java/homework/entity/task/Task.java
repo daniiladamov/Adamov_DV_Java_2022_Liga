@@ -1,5 +1,6 @@
 package homework.entity.task;
 
+import com.sun.istack.NotNull;
 import homework.util.EnumStatus;
 import homework.entity.comment.Comment;
 import homework.entity.project.Project;
@@ -30,6 +31,7 @@ public class Task {
     @Column(name = "id")
     private Long id;
     @Column(name = "title")
+    @NotNull
     private String title;
     @Column(name = "description")
     private String description;
@@ -42,9 +44,11 @@ public class Task {
     private Calendar date;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @NotNull
     private User user;
     @ManyToOne
     @JoinColumn(name="project_id",referencedColumnName = "id")
+    @NotNull
     private Project project;
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)

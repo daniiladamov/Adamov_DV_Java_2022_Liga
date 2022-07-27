@@ -22,3 +22,4 @@ spring:
     show-sql: true
 #  flyway:
 #    baseline-on-migrate: true
+exception_message: Объект %s c id=%d не найден

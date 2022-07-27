@@ -1,5 +1,6 @@
 package homework.entity.user;
 
+import com.sun.istack.NotNull;
 import homework.entity.project.Project;
 import homework.entity.task.Task;
 import lombok.EqualsAndHashCode;
@@ -27,21 +28,25 @@ public class User {
     @Column(name = "id")
     private Long id;
     @Column(name = "first_name")
+    @NotNull
     private String firstName;
     @Column(name = "last_name")
+    @NotNull
     private String lastName;
-    @Column(name="surname")
+    @Column(name = "surname")
     private String surname;
-    @Column(name="login")
+    @Column(name = "login")
+    @NotNull
     private String login;
-    @Column(name="password")
+    @NotNull
+    @Column(name = "password")
     private String password;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
-    private List<Task> taskList=new ArrayList<>();
+    private List<Task> taskList = new ArrayList<>();
     @ManyToMany(mappedBy = "users")
     @Fetch(FetchMode.SUBSELECT)
-    private Set<Project> projects=new HashSet<>();
+    private Set<Project> projects = new HashSet<>();
 
     public void addTask(Task task) {
         taskList.add(task);

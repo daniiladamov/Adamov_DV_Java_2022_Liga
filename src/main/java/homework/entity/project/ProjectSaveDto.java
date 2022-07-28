@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
-public class ProjectDto {
-    private Long id;
+@NoArgsConstructor
+public class ProjectSaveDto {
+    @NotBlank
     private String title;
     private String description;
 }

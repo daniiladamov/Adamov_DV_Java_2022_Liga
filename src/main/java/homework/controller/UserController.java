@@ -5,32 +5,44 @@ import homework.entity.user.UserGetDto;
 import homework.entity.user.UserSaveDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.UserService;
+import homework.util.CustomPage;
+import homework.util.DtoMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.MethodParameter;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.Binding;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
+    private final DtoMapper dtoMapper;
     private final UserService userService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
 
+    @GetMapping
+    public ResponseEntity<Page<UserGetDto>> getUsers(CustomPage customPage){
+        Page<User> users=userService.getUsers(customPage);
+        return new ResponseEntity<>(dtoMapper.mapToPage(users,UserGetDto.class),HttpStatus.OK);
+    }
     @PostMapping
     public ResponseEntity<Long> createUser(@Valid @RequestBody UserSaveDto userSaveDto){
-
         User user=modelMapper.map(userSaveDto,User.class);
         Long userId=userService.createUser(user);
         return new ResponseEntity<>(userId, HttpStatus.CREATED);
@@ -48,7 +60,7 @@ public class UserController {
                     String.format(exceptionMessage,User.class.getSimpleName(),id));
         }
     }
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<UserGetDto> updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id)
             throws EntityNotFoundException{
         User user=modelMapper.map(userSaveDto,User.class);
@@ -64,20 +76,5 @@ public class UserController {
         UserGetDto userGetDto=modelMapper.map(user, UserGetDto.class);
         return new ResponseEntity<>(userGetDto, HttpStatus.OK);
     }
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> objectNotFoundResponse(EntityNotFoundException ex){
-        return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
-    }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> totValidResponse(MethodArgumentNotValidException ex){
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
-    }
 }

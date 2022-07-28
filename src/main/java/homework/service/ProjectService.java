@@ -52,7 +52,7 @@ public class ProjectService {
                 Project.class.getSimpleName(),project.getId()));
     }
     @Transactional
-    public Project deleteUser(Long id) {
+    public Project deleteProject(Long id) {
         Optional<Project> projectInBd=projectRepo.findById(id);
         if (projectInBd.isPresent()){
             projectRepo.delete(projectInBd.get());

@@ -36,12 +36,12 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity<Long> createProject(@Valid @RequestBody ProjectSaveDto projectSaveDto){
         Project project=modelMapper.map(projectSaveDto,Project.class);
-        Long userId=projectService.createProject(project);
-        return new ResponseEntity<>(userId, HttpStatus.CREATED);
+        Long projectId=projectService.createProject(project);
+        return new ResponseEntity<>(projectId, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> getUser(@PathVariable Long id) throws EntityNotFoundException {
+    public ResponseEntity<ProjectGetDto> getProject(@PathVariable Long id) throws EntityNotFoundException {
         Optional<Project> project= projectService.getProject(id);
         if (project.isPresent()){
             ProjectGetDto projectGetDto=modelMapper.map(project.get(),ProjectGetDto.class);
@@ -54,7 +54,7 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> updateUser(@Valid @RequestBody ProjectSaveDto projectSaveDto, @PathVariable Long id)
+    public ResponseEntity<ProjectGetDto> updateProject(@Valid @RequestBody ProjectSaveDto projectSaveDto, @PathVariable Long id)
             throws EntityNotFoundException{
         Project project=modelMapper.map(projectSaveDto,Project.class);
         project.setId(id);
@@ -63,9 +63,9 @@ public class ProjectController {
         return new ResponseEntity<>(projectGetDto,HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> deleteUser(@PathVariable Long id)
+    public ResponseEntity<ProjectGetDto> deleteProject(@PathVariable Long id)
             throws EntityNotFoundException{
-        Project project =projectService.deleteUser(id);
+        Project project =projectService.deleteProject(id);
         ProjectGetDto projectGetDto=modelMapper.map(project, ProjectGetDto.class);
         return new ResponseEntity<>(projectGetDto, HttpStatus.OK);
     }

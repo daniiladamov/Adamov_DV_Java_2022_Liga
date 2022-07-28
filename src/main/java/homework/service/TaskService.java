@@ -1,6 +1,7 @@
 package homework.service;
 
 import com.sun.istack.NotNull;
+import homework.util.CustomPage;
 import homework.util.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.task.TaskFilter;
@@ -10,6 +11,10 @@ import homework.entity.user.User_;
 import homework.repository.TaskRepo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,17 +50,18 @@ public class TaskService {
     }
 
     @Transactional
-    public void save(@NotNull Task task) {
+    public Long save(@NotNull Task task) {
         if (task.getStatus() == null)
             task.setStatus(EnumStatus.EMPTY);
         taskRepo.save(task);
+        return task.getId();
     }
 
-//    public Page<Task> getPages(TaskPage taskPage) {
-//        Sort sort = Sort.by(taskPage.getSortDirection(), taskPage.getSortBy());
-//        Pageable pageable = PageRequest.of(taskPage.getPageNumber(), taskPage.getPageSize(), sort);
-//        return taskRepo.findAll(pageable);
-//    }
+    public Page<Task> getTasks(CustomPage taskPage) {
+        Sort sort = Sort.by(taskPage.getSortDirection(), taskPage.getSortBy());
+        Pageable pageable = PageRequest.of(taskPage.getPageNumber(), taskPage.getPageSize(), sort);
+        return taskRepo.findAll(pageable);
+    }
 
     public List<Task> getTaskMaxCount(TaskFilter taskFilter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

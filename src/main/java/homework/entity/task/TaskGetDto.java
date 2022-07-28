@@ -12,7 +12,7 @@ import java.util.Calendar;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class TaskDto {
+public class TaskGetDto {
     private Long id;
     private String title;
     private EnumStatus status;

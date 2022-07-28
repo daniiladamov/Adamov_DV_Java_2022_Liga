@@ -1,6 +1,6 @@
 package homework.controller;
 
-import homework.entity.task.TaskDto;
+import homework.entity.task.TaskGetDto;
 import homework.entity.task.TaskFilter;
 import homework.service.CommandService;
 import homework.service.TaskService;
@@ -64,9 +64,9 @@ public class CommandController {
      * @return  список задачи пользователя с наибольшим количеством задач. Опционально моежт быть отфильтрован.
      */
     @GetMapping("/tasks")
-    public ResponseEntity<List<TaskDto>> getTaskMaxCount(TaskFilter taskFilter){
+    public ResponseEntity<List<TaskGetDto>> getTaskMaxCount(TaskFilter taskFilter){
         return new ResponseEntity<>(taskService.getTaskMaxCount(taskFilter).stream().
-                map(task->modelMapper.map(task, TaskDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+                map(task->modelMapper.map(task, TaskGetDto.class)).collect(Collectors.toList()), HttpStatus.OK);
     }
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity getException(){

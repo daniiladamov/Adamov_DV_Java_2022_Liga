@@ -10,20 +10,12 @@ import homework.util.DtoMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.Binding;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -37,43 +29,44 @@ public class UserController {
     private String exceptionMessage;
 
     @GetMapping
-    public ResponseEntity<Page<UserGetDto>> getUsers(CustomPage customPage){
-        Page<User> users=userService.getUsers(customPage);
-        return new ResponseEntity<>(dtoMapper.mapToPage(users,UserGetDto.class),HttpStatus.OK);
+    public ResponseEntity<Page<UserGetDto>> getUsers(CustomPage customPage) {
+        Page<User> users = userService.getUsers(customPage);
+        return new ResponseEntity<>(dtoMapper.mapToPage(users, UserGetDto.class), HttpStatus.OK);
     }
+
     @PostMapping
-    public ResponseEntity<Long> createUser(@Valid @RequestBody UserSaveDto userSaveDto){
-        User user=modelMapper.map(userSaveDto,User.class);
-        Long userId=userService.createUser(user);
+    public ResponseEntity<Long> createUser(@Valid @RequestBody UserSaveDto userSaveDto) {
+        User user = modelMapper.map(userSaveDto, User.class);
+        Long userId = userService.createUser(user);
         return new ResponseEntity<>(userId, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserGetDto> getUser(@PathVariable Long id) throws EntityNotFoundException {
         Optional<User> user = userService.getUser(id);
-        if (user.isPresent()){
-            UserGetDto userGetDto=modelMapper.map(user.get(),UserGetDto.class);
-            return new ResponseEntity<>(userGetDto,HttpStatus.OK);
-        }
-        else {
+        if (user.isPresent()) {
+            UserGetDto userGetDto = modelMapper.map(user.get(), UserGetDto.class);
+            return new ResponseEntity<>(userGetDto, HttpStatus.OK);
+        } else {
             throw new EntityNotFoundException(
-                    String.format(exceptionMessage,User.class.getSimpleName(),id));
+                    String.format(exceptionMessage, User.class.getSimpleName(), id));
         }
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<UserGetDto> updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id)
-            throws EntityNotFoundException{
-        User user=modelMapper.map(userSaveDto,User.class);
+            throws EntityNotFoundException {
+        User user = modelMapper.map(userSaveDto, User.class);
         user.setId(id);
         User userUpdate = userService.updateUser(user);
-        UserGetDto userGetDto=modelMapper.map(userUpdate,UserGetDto.class);
-        return new ResponseEntity<>(userGetDto,HttpStatus.OK);
+        UserGetDto userGetDto = modelMapper.map(userUpdate, UserGetDto.class);
+        return new ResponseEntity<>(userGetDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserGetDto> deleteUser(@PathVariable Long id) {
-        User user=userService.deleteUser(id);
-        UserGetDto userGetDto=modelMapper.map(user, UserGetDto.class);
+        User user = userService.deleteUser(id);
+        UserGetDto userGetDto = modelMapper.map(user, UserGetDto.class);
         return new ResponseEntity<>(userGetDto, HttpStatus.OK);
     }
 

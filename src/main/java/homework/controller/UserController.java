@@ -10,10 +10,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -26,11 +29,8 @@ public class UserController {
     private String exceptionMessage;
 
     @PostMapping
-    public ResponseEntity<Long> createUser(@RequestBody @Valid UserSaveDto userSaveDto, BindingResult bindingResult){
-        if (bindingResult.hasErrors()){
-            //@todo: не работате валидация, разберись, пёс!
-            System.out.println(" ");
-        }
+    public ResponseEntity<Long> createUser(@Valid @RequestBody UserSaveDto userSaveDto){
+
         User user=modelMapper.map(userSaveDto,User.class);
         Long userId=userService.createUser(user);
         return new ResponseEntity<>(userId, HttpStatus.CREATED);
@@ -49,14 +49,8 @@ public class UserController {
         }
     }
     @PostMapping("/{id}")
-    public ResponseEntity<UserGetDto> updateUser(@Valid @RequestBody UserSaveDto userSaveDto,
-//                                                 BindingResult bindingResult,
-                                                 @PathVariable Long id)
+    public ResponseEntity<UserGetDto> updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id)
             throws EntityNotFoundException{
-//        if (bindingResult.hasErrors()){
-//            Map<String, Object> model = bindingResult.getModel();
-//            System.out.println(model);
-//        }
         User user=modelMapper.map(userSaveDto,User.class);
         user.setId(id);
         User userUpdate = userService.updateUser(user);
@@ -75,8 +69,15 @@ public class UserController {
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
     }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<String> totValidResponse(MethodArgumentNotValidException ex){
-//        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> totValidResponse(MethodArgumentNotValidException ex){
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
 }

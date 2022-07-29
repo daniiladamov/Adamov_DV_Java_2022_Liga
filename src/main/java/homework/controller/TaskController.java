@@ -3,8 +3,6 @@ package homework.controller;
 import homework.entity.task.Task;
 import homework.entity.task.TaskGetDto;
 import homework.entity.task.TaskSaveDto;
-import homework.entity.user.User;
-import homework.entity.user.UserGetDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.TaskService;
 import homework.util.CustomPage;
@@ -14,7 +12,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

@@ -96,7 +96,10 @@ public class TaskMapper implements SimpleMapper<Task> {
             task.setTitle(title);
             task.setDescription(description);
             task.setUser(user.get());
-            task.setDate(GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault())));
+            task.setDate(Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+//                    GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()))
+
+            );
             if (status != null)
                 task.setStatus(status);
             else

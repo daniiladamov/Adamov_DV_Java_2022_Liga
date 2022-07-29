@@ -9,7 +9,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
-public class HomeworkConfig {
+public class Config {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)

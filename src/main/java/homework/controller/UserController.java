@@ -1,9 +1,15 @@
 package homework.controller;
 
+import homework.entity.project.Project;
+import homework.entity.task.Task;
+import homework.entity.task.TaskSaveDto;
 import homework.entity.user.User;
 import homework.entity.user.UserGetDto;
 import homework.entity.user.UserSaveDto;
 import homework.exception.EntityNotFoundException;
+import homework.service.ProjectService;
+import homework.service.RelationService;
+import homework.service.TaskService;
 import homework.service.UserService;
 import homework.util.CustomPage;
 import homework.util.DtoMapper;
@@ -15,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -23,7 +30,10 @@ import java.util.Optional;
 @RequestMapping("/v2/users")
 public class UserController {
     private final DtoMapper dtoMapper;
+    private final RelationService relationService;
     private final UserService userService;
+    private final TaskService taskService;
+    private final ProjectService projectService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
@@ -54,8 +64,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserGetDto> updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id)
-            throws EntityNotFoundException {
+    public ResponseEntity<UserGetDto> updateUser(@Valid @RequestBody UserSaveDto userSaveDto,
+                                                 @PathVariable Long id) throws EntityNotFoundException {
         User user = modelMapper.map(userSaveDto, User.class);
         user.setId(id);
         User userUpdate = userService.updateUser(user);
@@ -68,6 +78,15 @@ public class UserController {
         User user = userService.deleteUser(id);
         UserGetDto userGetDto = modelMapper.map(user, UserGetDto.class);
         return new ResponseEntity<>(userGetDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/tasks")
+    @ResponseStatus(HttpStatus.OK)
+    public Long addTask(@Valid @RequestBody TaskSaveDto taskSaveDto, @PathVariable Long id,
+                        @RequestParam(name="project-id") Long projectId)
+            throws EntityNotFoundException {
+        Task task = modelMapper.map(taskSaveDto, Task.class);
+        return relationService.createTask(task,id,projectId);
     }
 
 }

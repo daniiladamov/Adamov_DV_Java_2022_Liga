@@ -4,7 +4,7 @@ import homework.entity.comment.Comment;
 import homework.entity.project.Project;
 import homework.entity.user.User;
 import homework.util.EnumStatus;
-import java.util.Calendar;
+import java.util.Date;
 import javax.annotation.Generated;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
@@ -14,7 +14,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Task.class)
 public abstract class Task_ {
 
-	public static volatile SingularAttribute<Task, Calendar> date;
+	public static volatile SingularAttribute<Task, Date> date;
 	public static volatile SingularAttribute<Task, String> description;
 	public static volatile SingularAttribute<Task, Project> project;
 	public static volatile SetAttribute<Task, Comment> comment;

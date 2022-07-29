@@ -16,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,24 +32,24 @@ public class Task {
     @Column(name = "id")
     private Long id;
     @Column(name = "title")
-    @NotNull
+    @javax.validation.constraints.NotNull
     private String title;
     @Column(name = "description")
     private String description;
     @Enumerated(EnumType.STRING)
     @Column(name="status",columnDefinition = "varchar(255) default 'EMPTY'")
     private EnumStatus status;
-    @Column(name="task_date")
+    @Column(name="task_date", columnDefinition = "date default current_date")
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd.MM.yyyy")
-    private Calendar date;
+    private Date date;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
-    @NotNull
+    @javax.validation.constraints.NotNull
     private User user;
     @ManyToOne
     @JoinColumn(name="project_id",referencedColumnName = "id")
-    @NotNull
+    @javax.validation.constraints.NotNull
     private Project project;
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)

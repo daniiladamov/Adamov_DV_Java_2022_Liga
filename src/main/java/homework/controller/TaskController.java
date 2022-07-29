@@ -2,11 +2,11 @@ package homework.controller;
 
 import homework.entity.task.Task;
 import homework.entity.task.TaskGetDto;
-import homework.entity.task.TaskSaveDto;
 import homework.exception.EntityNotFoundException;
+import homework.service.RelationService;
 import homework.service.TaskService;
 import homework.util.CustomPage;
-import homework.util.DtoMapper;
+import homework.util.DtoPageMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+
 import java.util.Optional;
 
 @RestController
@@ -22,23 +22,17 @@ import java.util.Optional;
 @RequestMapping("/v2/tasks")
 public class TaskController {
     private final TaskService taskService;
+    private final RelationService relationService;
     private final ModelMapper modelMapper;
-    private final DtoMapper dtoMapper;
+    private final DtoPageMapper dtoPageMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Long createTask(@Valid @RequestBody TaskSaveDto taskSaveDto){
-        Task task=modelMapper.map(taskSaveDto, Task.class);
-        return taskService.save(task);
-    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<TaskGetDto> getTasks(CustomPage customPage) {
         Page<Task> tasks = taskService.getTasks(customPage);
-        return dtoMapper.mapToPage(tasks, TaskGetDto.class);
+        return dtoPageMapper.mapToPage(tasks, TaskGetDto.class);
     }
 
     @GetMapping("/{id}")
@@ -53,6 +47,16 @@ public class TaskController {
                     String.format(exceptionMessage, Task.class.getSimpleName(), id));
         }
     }
-
-    //@todo: put, delete mapping и т.д
+//@todo:вслед за задачей должны удалиться все комменты, проверить + если user из project_user при условии изменения баланса
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskGetDto deleteTask(@PathVariable Long id){
+        Optional<Task> taskOptional=taskService.getTask(id);
+        if (taskOptional.isPresent()){
+            return null; //@todo
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage, Task.class.getSimpleName(), id));
+    }
 }

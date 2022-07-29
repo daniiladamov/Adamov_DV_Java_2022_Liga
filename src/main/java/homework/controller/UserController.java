@@ -1,6 +1,5 @@
 package homework.controller;
 
-import homework.entity.project.Project;
 import homework.entity.task.Task;
 import homework.entity.task.TaskSaveDto;
 import homework.entity.user.User;
@@ -12,7 +11,7 @@ import homework.service.RelationService;
 import homework.service.TaskService;
 import homework.service.UserService;
 import homework.util.CustomPage;
-import homework.util.DtoMapper;
+import homework.util.DtoPageMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -29,11 +27,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
-    private final DtoMapper dtoMapper;
-    private final RelationService relationService;
+    private final DtoPageMapper dtoPageMapper;
     private final UserService userService;
-    private final TaskService taskService;
-    private final ProjectService projectService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
@@ -41,7 +36,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<UserGetDto>> getUsers(CustomPage customPage) {
         Page<User> users = userService.getUsers(customPage);
-        return new ResponseEntity<>(dtoMapper.mapToPage(users, UserGetDto.class), HttpStatus.OK);
+        return new ResponseEntity<>(dtoPageMapper.mapToPage(users, UserGetDto.class), HttpStatus.OK);
     }
 
     @PostMapping
@@ -72,21 +67,11 @@ public class UserController {
         UserGetDto userGetDto = modelMapper.map(userUpdate, UserGetDto.class);
         return new ResponseEntity<>(userGetDto, HttpStatus.OK);
     }
-
+    //@todo: вслед за юзером улетает запись из таблицы project_user, а также все задачи с комментами
     @DeleteMapping("/{id}")
     public ResponseEntity<UserGetDto> deleteUser(@PathVariable Long id) {
         User user = userService.deleteUser(id);
         UserGetDto userGetDto = modelMapper.map(user, UserGetDto.class);
         return new ResponseEntity<>(userGetDto, HttpStatus.OK);
     }
-
-    @PostMapping("/{id}/tasks")
-    @ResponseStatus(HttpStatus.OK)
-    public Long addTask(@Valid @RequestBody TaskSaveDto taskSaveDto, @PathVariable Long id,
-                        @RequestParam(name="project-id") Long projectId)
-            throws EntityNotFoundException {
-        Task task = modelMapper.map(taskSaveDto, Task.class);
-        return relationService.createTask(task,id,projectId);
-    }
-
 }

@@ -38,6 +38,7 @@ public class Project {
     )
     @Fetch(FetchMode.SUBSELECT)
     private Set<User> users=new HashSet<>();
+
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Fetch(FetchMode.SUBSELECT)
     private Set<Task> tasks=new HashSet<>();

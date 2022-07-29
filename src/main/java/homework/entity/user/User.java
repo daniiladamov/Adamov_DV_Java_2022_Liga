@@ -37,19 +37,15 @@ public class User {
     @javax.validation.constraints.NotNull
     @Column(name = "password")
     private String password;
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @Fetch(FetchMode.SUBSELECT)
     private List<Task> taskList = new ArrayList<>();
+
     @ManyToMany(mappedBy = "users")
     @Fetch(FetchMode.SUBSELECT)
     private Set<Project> projects = new HashSet<>();
 
     public void addTask(@NonNull Task task) {
         taskList.add(task);
-    }
-
-    public void addProject(@NonNull Project project) {
-        projects.add(project);
     }
 }

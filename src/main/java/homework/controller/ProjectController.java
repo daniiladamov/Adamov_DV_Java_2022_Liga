@@ -3,10 +3,13 @@ package homework.controller;
 import homework.entity.project.Project;
 import homework.entity.project.ProjectGetDto;
 import homework.entity.project.ProjectSaveDto;
+import homework.entity.task.Task;
+import homework.entity.task.TaskSaveDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.ProjectService;
+import homework.service.RelationService;
 import homework.util.CustomPage;
-import homework.util.DtoMapper;
+import homework.util.DtoPageMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,15 +26,16 @@ import java.util.Optional;
 @RequestMapping("/v2/projects")
 public class ProjectController {
     private final ProjectService projectService;
+    private RelationService relationService;
     private final ModelMapper modelMapper;
-    private final DtoMapper dtoMapper;
+    private final DtoPageMapper dtoPageMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
 
     @GetMapping
     public ResponseEntity<Page<ProjectGetDto>> getProjects(CustomPage customPage){
         Page<Project> projects=projectService.getProjects(customPage);
-        return new ResponseEntity<>(dtoMapper.mapToPage(projects,ProjectGetDto.class), HttpStatus.OK);
+        return new ResponseEntity<>(dtoPageMapper.mapToPage(projects,ProjectGetDto.class), HttpStatus.OK);
     }
     @PostMapping
     public ResponseEntity<Long> createProject(@Valid @RequestBody ProjectSaveDto projectSaveDto){
@@ -54,7 +58,8 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> updateProject(@Valid @RequestBody ProjectSaveDto projectSaveDto, @PathVariable Long id)
+    public ResponseEntity<ProjectGetDto> updateProject(@Valid @RequestBody ProjectSaveDto projectSaveDto,
+                                                       @PathVariable Long id)
             throws EntityNotFoundException{
         Project project=modelMapper.map(projectSaveDto,Project.class);
         project.setId(id);
@@ -62,12 +67,21 @@ public class ProjectController {
         ProjectGetDto projectGetDto=modelMapper.map(projectUpdate,ProjectGetDto.class);
         return new ResponseEntity<>(projectGetDto,HttpStatus.OK);
     }
+    //@todo: вслед за проектом улетает запись из таблицы project_user, а также все задачи с комментами
     @DeleteMapping("/{id}")
     public ResponseEntity<ProjectGetDto> deleteProject(@PathVariable Long id)
             throws EntityNotFoundException{
         Project project =projectService.deleteProject(id);
         ProjectGetDto projectGetDto=modelMapper.map(project, ProjectGetDto.class);
         return new ResponseEntity<>(projectGetDto, HttpStatus.OK);
+    }
+    @PostMapping("/{id}/tasks")
+    @ResponseStatus(HttpStatus.OK)
+    public Long addTask(@Valid @RequestBody TaskSaveDto taskSaveDto, @PathVariable Long id,
+                        @RequestParam(name="user-id") Long userId)
+            throws EntityNotFoundException {
+        Task task = modelMapper.map(taskSaveDto, Task.class);
+        return relationService.createTask(task,userId,id);
     }
 
 }

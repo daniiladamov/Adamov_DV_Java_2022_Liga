@@ -8,8 +8,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
-public class CommentDto {
+public class CommentGetDto {
     private Long id;
     private String content;
 }

@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,7 +48,7 @@ public class Task {
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     @javax.validation.constraints.NotNull
     private User user;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     @JoinColumn(name="project_id",referencedColumnName = "id")
     @javax.validation.constraints.NotNull
     private Project project;

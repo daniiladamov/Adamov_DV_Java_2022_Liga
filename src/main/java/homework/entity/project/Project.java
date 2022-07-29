@@ -30,7 +30,7 @@ public class Project {
     @Column(name = "description")
     @NotNull
     private String description;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(
             name = "project_user",
             joinColumns = @JoinColumn(name="project_id"),
@@ -41,4 +41,8 @@ public class Project {
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Fetch(FetchMode.SUBSELECT)
     private Set<Task> tasks=new HashSet<>();
+
+    public void addUser(User user){
+        users.add(user);
+    }
 }

@@ -2,10 +2,7 @@ package homework.entity.user;
 
 import homework.entity.project.Project;
 import homework.entity.task.Task;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -41,14 +38,18 @@ public class User {
     @Column(name = "password")
     private String password;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST,CascadeType.REFRESH,CascadeType.REMOVE})
+            cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @Fetch(FetchMode.SUBSELECT)
     private List<Task> taskList = new ArrayList<>();
     @ManyToMany(mappedBy = "users")
     @Fetch(FetchMode.SUBSELECT)
     private Set<Project> projects = new HashSet<>();
 
-    public void addTask(Task task) {
+    public void addTask(@NonNull Task task) {
         taskList.add(task);
+    }
+
+    public void addProject(@NonNull Project project) {
+        projects.add(project);
     }
 }

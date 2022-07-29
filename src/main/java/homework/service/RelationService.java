@@ -28,6 +28,7 @@ public class RelationService {
             Project project=projectOptional.get();
             task.setUser(user);
             task.setProject(project);
+            project.addUser(user);
             return taskService.save(task);
         }
         else{

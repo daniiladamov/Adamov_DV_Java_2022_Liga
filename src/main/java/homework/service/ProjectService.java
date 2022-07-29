@@ -5,6 +5,7 @@ import homework.entity.user.User;
 import homework.exception.EntityNotFoundException;
 import homework.repository.ProjectRepo;
 import homework.util.CustomPage;
+import homework.util.Specifications;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,5 +61,9 @@ public class ProjectService {
         }
         else throw new EntityNotFoundException(String.format(exceptionMessage,
                 Project.class.getSimpleName(),id));
+    }
+
+    public Page<Project> getProjectsByUser(User user, Pageable pageable){
+        return projectRepo.findAll(Specifications.getUserProjects(user),pageable);
     }
 }

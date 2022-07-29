@@ -1,9 +1,9 @@
 package homework.service;
 
-import homework.util.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import homework.repository.TaskRepo;
+import homework.util.EnumStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -11,7 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 class TaskServiceTest {
@@ -25,7 +25,7 @@ class TaskServiceTest {
         user.setId(1L);
         task.setId(1L);
         task.setUser(user);
-        task.setDate(Calendar.getInstance());
+        task.setDate(new Date());
         MockitoAnnotations.openMocks(this);
         user.setTaskList(new ArrayList<>());
         user.addTask(task);

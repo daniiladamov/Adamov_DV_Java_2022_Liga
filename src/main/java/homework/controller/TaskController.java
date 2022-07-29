@@ -1,7 +1,10 @@
 package homework.controller;
 
+import homework.entity.comment.Comment;
+import homework.entity.comment.CommentSaveDto;
 import homework.entity.task.Task;
 import homework.entity.task.TaskGetDto;
+import homework.entity.task.TaskSaveDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.RelationService;
 import homework.service.TaskService;
@@ -14,7 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -47,16 +50,28 @@ public class TaskController {
                     String.format(exceptionMessage, Task.class.getSimpleName(), id));
         }
     }
-//@todo:вслед за задачей должны удалиться все комменты, проверить + если user из project_user при условии изменения баланса
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskGetDto deleteTask(@PathVariable Long id){
-        Optional<Task> taskOptional=taskService.getTask(id);
-        if (taskOptional.isPresent()){
-            return null; //@todo
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage, Task.class.getSimpleName(), id));
+    public void deleteTask(@PathVariable Long id){
+        relationService.removeTask(id);
+        if(!taskService.removeTask(id))
+            throw new EntityNotFoundException(String.format(exceptionMessage,Task.class.getSimpleName(),id));
+    }
+
+    @PostMapping("/{id}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Long createCommentForTask(@PathVariable Long id, @Valid @RequestBody CommentSaveDto commentSaveDto)
+    throws EntityNotFoundException{
+        Comment comment = modelMapper.map(commentSaveDto, Comment.class);
+        return relationService.createComment(comment,id);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskGetDto updateTask(@PathVariable Long id, @RequestBody TaskSaveDto taskSaveDto){
+        Task task=modelMapper.map(taskSaveDto,Task.class);
+        task.setId(id);
+        Task taskUpdate=relationService.updateTask(task);
+        return modelMapper.map(taskUpdate,TaskGetDto.class);
     }
 }

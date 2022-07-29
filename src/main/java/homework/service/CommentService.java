@@ -1,6 +1,8 @@
 package homework.service;
 
 import homework.entity.comment.Comment;
+import homework.entity.task.Task;
+import homework.exception.EntityNotFoundException;
 import homework.repository.CommentRepo;
 import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CommentService {
     private final CommentRepo commentRepo;
+    @Value("${exception_message}")
+    private String exceptionMessage;
 
     public Page<Comment> getComments(CustomPage customPage) {
         Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
@@ -28,5 +32,22 @@ public class CommentService {
 
     public Optional<Comment> getComment(Long id) {
         return commentRepo.findById(id);
+    }
+
+    @Transactional
+    public Comment create(Comment comment) {
+        return commentRepo.save(comment);
+
+    }
+    @Transactional
+    public void remove(Long id) {
+        Optional<Comment> commentOptional=commentRepo.findById(id);
+        if (commentOptional.isPresent()){
+            commentRepo.delete(commentOptional.get());
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage, Task.class.getSimpleName(),id));
+
     }
 }

@@ -1,14 +1,14 @@
 package homework.service;
 
 import com.sun.istack.NotNull;
-import homework.util.CustomPage;
-import homework.util.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.task.TaskFilter;
 import homework.entity.task.Task_;
 import homework.entity.user.User;
 import homework.entity.user.User_;
 import homework.repository.TaskRepo;
+import homework.util.CustomPage;
+import homework.util.EnumStatus;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,6 +47,11 @@ public class TaskService {
             return true;
         } else
             return false;
+    }
+
+    @Transactional
+    public Task updateTask(@NonNull Task task){
+        return taskRepo.save(task);
     }
 
     @Transactional

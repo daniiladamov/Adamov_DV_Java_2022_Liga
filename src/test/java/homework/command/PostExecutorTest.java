@@ -10,10 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
+import java.util.Date;
 
 class PostExecutorTest {
     @Mock
@@ -30,7 +28,7 @@ class PostExecutorTest {
         user.setId(1L);
         task.setId(1L);
         task.setUser(user);
-        task.setDate(Calendar.getInstance());
+        task.setDate(new Date());
         MockitoAnnotations.openMocks(this);
         user.setTaskList(new ArrayList<>());
         user.addTask(task);

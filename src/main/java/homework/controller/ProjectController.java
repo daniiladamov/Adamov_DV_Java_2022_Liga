@@ -15,7 +15,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,30 +25,31 @@ import java.util.Optional;
 @RequestMapping("/v2/projects")
 public class ProjectController {
     private final ProjectService projectService;
-    private RelationService relationService;
+    private final RelationService relationService;
     private final ModelMapper modelMapper;
     private final DtoPageMapper dtoPageMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
 
     @GetMapping
-    public ResponseEntity<Page<ProjectGetDto>> getProjects(CustomPage customPage){
+    @ResponseStatus(HttpStatus.OK)
+    public Page<ProjectGetDto> getProjects(CustomPage customPage){
         Page<Project> projects=projectService.getProjects(customPage);
-        return new ResponseEntity<>(dtoPageMapper.mapToPage(projects,ProjectGetDto.class), HttpStatus.OK);
+        return dtoPageMapper.mapToPage(projects,ProjectGetDto.class);
     }
     @PostMapping
-    public ResponseEntity<Long> createProject(@Valid @RequestBody ProjectSaveDto projectSaveDto){
+    @ResponseStatus(HttpStatus.CREATED)
+    public Long createProject(@Valid @RequestBody ProjectSaveDto projectSaveDto){
         Project project=modelMapper.map(projectSaveDto,Project.class);
-        Long projectId=projectService.createProject(project);
-        return new ResponseEntity<>(projectId, HttpStatus.CREATED);
+        return projectService.createProject(project);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> getProject(@PathVariable Long id) throws EntityNotFoundException {
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectGetDto getProject(@PathVariable Long id) throws EntityNotFoundException {
         Optional<Project> project= projectService.getProject(id);
         if (project.isPresent()){
-            ProjectGetDto projectGetDto=modelMapper.map(project.get(),ProjectGetDto.class);
-            return new ResponseEntity<>(projectGetDto,HttpStatus.OK);
+            return modelMapper.map(project.get(),ProjectGetDto.class);
         }
         else {
             throw new EntityNotFoundException(
@@ -58,22 +58,20 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> updateProject(@Valid @RequestBody ProjectSaveDto projectSaveDto,
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectGetDto updateProject(@Valid @RequestBody ProjectSaveDto projectSaveDto,
                                                        @PathVariable Long id)
             throws EntityNotFoundException{
         Project project=modelMapper.map(projectSaveDto,Project.class);
         project.setId(id);
         Project projectUpdate = projectService.updateProject(project);
-        ProjectGetDto projectGetDto=modelMapper.map(projectUpdate,ProjectGetDto.class);
-        return new ResponseEntity<>(projectGetDto,HttpStatus.OK);
+        return modelMapper.map(projectUpdate,ProjectGetDto.class);
     }
-    //@todo: вслед за проектом улетает запись из таблицы project_user, а также все задачи с комментами
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> deleteProject(@PathVariable Long id)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteProject(@PathVariable Long id)
             throws EntityNotFoundException{
-        Project project =projectService.deleteProject(id);
-        ProjectGetDto projectGetDto=modelMapper.map(project, ProjectGetDto.class);
-        return new ResponseEntity<>(projectGetDto, HttpStatus.OK);
+        relationService.deleteProject(id);
     }
     @PostMapping("/{id}/tasks")
     @ResponseStatus(HttpStatus.OK)

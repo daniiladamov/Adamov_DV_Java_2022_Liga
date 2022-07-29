@@ -1,22 +1,19 @@
 package homework.entity.task;
 
-import com.sun.istack.NotNull;
-import homework.util.EnumStatus;
 import homework.entity.comment.Comment;
 import homework.entity.project.Project;
 import homework.entity.user.User;
-import lombok.EqualsAndHashCode;
+import homework.util.EnumStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,14 +23,13 @@ import java.util.Set;
 @Entity
 @Table(name="tasks")
 @NoArgsConstructor
-@EqualsAndHashCode
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
     @Column(name = "title")
-    @javax.validation.constraints.NotNull
+    @NotNull
     private String title;
     @Column(name = "description")
     private String description;
@@ -46,13 +42,14 @@ public class Task {
     private Date date;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
-    @javax.validation.constraints.NotNull
+    @NotNull
     private User user;
     @ManyToOne(cascade = {CascadeType.PERSIST})
     @JoinColumn(name="project_id",referencedColumnName = "id")
-    @javax.validation.constraints.NotNull
+    @NotNull
     private Project project;
-    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Fetch(FetchMode.SUBSELECT)
     private Set<Comment> comment=new HashSet<>();
 

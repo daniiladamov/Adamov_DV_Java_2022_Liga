@@ -1,4 +1,4 @@
-package homework.util;
+package homework.util.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

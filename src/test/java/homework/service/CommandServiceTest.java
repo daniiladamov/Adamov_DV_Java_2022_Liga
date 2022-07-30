@@ -1,7 +1,7 @@
 package homework.service;
 
 import homework.command.*;
-import homework.util.CommandEnum;
+import homework.util.enums.CommandEnum;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;

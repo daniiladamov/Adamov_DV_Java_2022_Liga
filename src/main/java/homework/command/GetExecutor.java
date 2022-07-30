@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static homework.util.MessageEnum.ERROR_RESULT;
-import static homework.util.PatternEnum.*;
+import static homework.util.enums.MessageEnum.ERROR_RESULT;
+import static homework.util.enums.PatternEnum.*;
 
 @Component
 @RequiredArgsConstructor

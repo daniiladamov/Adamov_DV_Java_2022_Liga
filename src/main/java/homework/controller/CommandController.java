@@ -4,7 +4,7 @@ import homework.entity.task.TaskGetDto;
 import homework.entity.task.TaskFilter;
 import homework.service.CommandService;
 import homework.service.TaskService;
-import homework.util.CommandEnum;
+import homework.util.enums.CommandEnum;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -73,16 +73,4 @@ public class CommandController {
         return new ResponseEntity("Необходимо передавать дату в формате dd-MM-yyyy",
                 HttpStatus.I_AM_A_TEAPOT);
     }
-
-//    @GetMapping("/tasks")
-//    public ResponseEntity<Page<TaskDto>>getTasks(TaskPage taskPage){
-//        return new ResponseEntity<>(getOtjectToDto(taskService.getPages(taskPage)), HttpStatus.OK);
-//    }
-//
-//    private Page<TaskDto> getOtjectToDto(Page<Task> tasksPage){
-//        List<TaskDto> collect = tasksPage.getContent().stream().map(task -> modelMapper.map(task, TaskDto.class))
-//                .collect(Collectors.toList());
-//        return new PageImpl<>(collect,tasksPage.getPageable(), tasksPage.getTotalElements());
-//    }
-
 }

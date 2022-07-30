@@ -5,7 +5,7 @@ import homework.entity.user.User;
 import homework.exception.MappingException;
 import homework.service.TaskService;
 import homework.service.UserService;
-import homework.util.EnumStatus;
+import homework.util.enums.EnumStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

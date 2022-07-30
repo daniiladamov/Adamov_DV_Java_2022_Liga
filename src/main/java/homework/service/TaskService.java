@@ -9,7 +9,7 @@ import homework.entity.user.User;
 import homework.entity.user.User_;
 import homework.repository.TaskRepo;
 import homework.util.CustomPage;
-import homework.util.EnumStatus;
+import homework.util.enums.EnumStatus;
 import homework.util.Specifications;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

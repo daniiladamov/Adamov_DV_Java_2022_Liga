@@ -64,4 +64,8 @@ public class UserService {
     public Page<User> getUsersByProject(Project project, Pageable pageable) {
         return userRepo.findAll(Specifications.getProjectUsers(project),pageable);
     }
+
+    public Optional<User> getUserByLogin(String login){
+        return userRepo.findByLogin(login);
+    }
 }

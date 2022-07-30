@@ -1,6 +1,7 @@
 package homework.controller;
 
 import homework.exception.EntityNotFoundException;
+import homework.exception.LoginAlreadyUsedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,9 @@ import java.util.Map;
 public class СustomControllerAdvice extends ResponseEntityExceptionHandler {
 
 
-    @ExceptionHandler({EntityNotFoundException.class})
+    @ExceptionHandler({EntityNotFoundException.class, LoginAlreadyUsedException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String objectNotFoundResponse(EntityNotFoundException ex) {
+    public String objectNotFoundResponse(RuntimeException ex) {
         return ex.getMessage();
     }
 

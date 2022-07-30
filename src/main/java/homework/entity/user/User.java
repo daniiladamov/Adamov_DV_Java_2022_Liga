@@ -2,7 +2,10 @@ package homework.entity.user;
 
 import homework.entity.project.Project;
 import homework.entity.task.Task;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -17,7 +20,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
+@Table(name = "users",uniqueConstraints= @UniqueConstraint(columnNames={"login"}))
 @NoArgsConstructor
 public class User {
     @Id
@@ -32,6 +35,7 @@ public class User {
     private String lastName;
     @Column(name = "surname")
     private String surname;
+    @Size(min = 4)
     @Column(name = "login")
     @NotNull
     private String login;

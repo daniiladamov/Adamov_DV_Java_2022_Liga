@@ -8,15 +8,18 @@ import homework.entity.user.User;
 import homework.entity.user.UserGetDto;
 import homework.entity.user.UserSaveDto;
 import homework.exception.EntityNotFoundException;
+import homework.exception.LoginAlreadyUsedException;
 import homework.service.RelationService;
 import homework.service.UserService;
 import homework.util.CustomPage;
 import homework.util.DtoPageMapper;
+import homework.util.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,6 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
+    private final UserValidator userValidator;
     private final DtoPageMapper dtoPageMapper;
     private final RelationService relationService;
     private final UserService userService;
@@ -56,7 +60,9 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createUser(@Valid @RequestBody UserSaveDto userSaveDto) {
+    public Long createUser(@Valid @RequestBody UserSaveDto userSaveDto, BindingResult bindingResult)
+    throws LoginAlreadyUsedException {
+        userValidator.validate(userSaveDto,bindingResult);
         User user = modelMapper.map(userSaveDto, User.class);
         return userService.createUser(user);
     }

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static homework.util.MessageEnum.ERROR_RESULT;
-import static homework.util.PatternEnum.TASK_BY_ID;
+import static homework.util.enums.MessageEnum.ERROR_RESULT;
+import static homework.util.enums.PatternEnum.TASK_BY_ID;
 
 @Component
 @RequiredArgsConstructor

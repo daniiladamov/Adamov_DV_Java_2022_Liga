@@ -1,46 +1,57 @@
 package homework.entity.user;
 
+import homework.entity.project.Project;
 import homework.entity.task.Task;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
+@Table(name = "users",uniqueConstraints= @UniqueConstraint(columnNames={"login"}))
 @NoArgsConstructor
-@EqualsAndHashCode
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "name")
-    private String name;
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Task> taskList;
+    @Column(name = "first_name")
+    @NotNull
+    private String firstName;
+    @Column(name = "last_name")
+    @NotNull
+    private String lastName;
+    @Column(name = "surname")
+    private String surname;
+    @Size(min = 4)
+    @Column(name = "login")
+    @NotNull
+    private String login;
+    @Size(min = 8)
+    @NotNull
+    @Column(name = "password")
+    private String password;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Task> taskList = new ArrayList<>();
 
-    public void addTask(Task task) {
+    @ManyToMany(mappedBy = "users")
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<Project> projects = new HashSet<>();
+
+    public void addTask(@NonNull Task task) {
         taskList.add(task);
-
-    }
-
-    public void removeTask(Task task) {
-        if (!taskList.remove(task))
-            System.err.println(String.format("У пользователя %s нет назначенной задачи %s", this, task));
-    }
-
-    @Override
-    public String toString() {
-        return "User:" +
-                "id=" + id +
-                ", name='" + name + '\''
-                + ", tasks=" + taskList.stream().map(x -> "Task#" + x.getId()).collect(Collectors.toList());
     }
 }

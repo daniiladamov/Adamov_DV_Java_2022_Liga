@@ -1,22 +1,19 @@
 package homework.mapper;
 
-import homework.entity.EnumStatus;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import homework.exception.MappingException;
 import homework.service.TaskService;
 import homework.service.UserService;
+import homework.util.enums.EnumStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 class TaskMapperTest {
@@ -30,17 +27,15 @@ class TaskMapperTest {
     private User user=new User();
     private Task task=new Task();
 
-    public TaskMapperTest() {
+    public TaskMapperTest() throws ParseException {
         user.setId(1L);
-        user.setName("Иван");
+        user.setFirstName("Иван");
         task.setId(1L);
         task.setUser(user);
         task.setTitle("ДЗ");
         task.setDescription("Сделать прям много чего");
-        task.setDate(GregorianCalendar.from(LocalDate.parse("26.09.2022", DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                .atStartOfDay(ZoneId.systemDefault())));
+        task.setDate(new SimpleDateFormat("dd.MM.yyyy").parse("26.09.2022"));
         MockitoAnnotations.openMocks(this);
-        user.setTaskList(new ArrayList<>());
         user.addTask(task);
         taskMapper=new TaskMapper(taskService,userService);
     }

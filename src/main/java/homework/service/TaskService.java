@@ -1,15 +1,22 @@
 package homework.service;
 
 import com.sun.istack.NotNull;
-import homework.entity.EnumStatus;
+import homework.entity.project.Project;
 import homework.entity.task.Task;
 import homework.entity.task.TaskFilter;
 import homework.entity.task.Task_;
 import homework.entity.user.User;
 import homework.entity.user.User_;
 import homework.repository.TaskRepo;
+import homework.util.CustomPage;
+import homework.util.enums.EnumStatus;
+import homework.util.Specifications;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,17 +52,23 @@ public class TaskService {
     }
 
     @Transactional
-    public void save(@NotNull Task task) {
+    public Task updateTask(@NonNull Task task){
+        return taskRepo.save(task);
+    }
+
+    @Transactional
+    public Long save(@NotNull Task task) {
         if (task.getStatus() == null)
             task.setStatus(EnumStatus.EMPTY);
         taskRepo.save(task);
+        return task.getId();
     }
 
-//    public Page<Task> getPages(TaskPage taskPage) {
-//        Sort sort = Sort.by(taskPage.getSortDirection(), taskPage.getSortBy());
-//        Pageable pageable = PageRequest.of(taskPage.getPageNumber(), taskPage.getPageSize(), sort);
-//        return taskRepo.findAll(pageable);
-//    }
+    public Page<Task> getTasks(CustomPage taskPage) {
+        Sort sort = Sort.by(taskPage.getSortDirection(), taskPage.getSortBy());
+        Pageable pageable = PageRequest.of(taskPage.getPageNumber(), taskPage.getPageSize(), sort);
+        return taskRepo.findAll(pageable);
+    }
 
     public List<Task> getTaskMaxCount(TaskFilter taskFilter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -106,5 +119,13 @@ public class TaskService {
     private static Calendar getDateFormat(String stringDate) {
         LocalDate date = LocalDate.parse(stringDate, dateFormat);
         return GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));
+    }
+
+    public Page<Task> getTasksByUser(User user, Pageable pageable) {
+        return taskRepo.findAll(Specifications.getUserTasks(user),pageable);
+    }
+
+    public Page<Task> getTasksByProject(Project project, Pageable pageable) {
+        return taskRepo.findAll(Specifications.getProjectTasks(project),pageable);
     }
 }

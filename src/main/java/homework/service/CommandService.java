@@ -1,7 +1,7 @@
 package homework.service;
 
 import homework.command.*;
-import homework.util.CommandEnum;
+import homework.util.enums.CommandEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package homework.command;
 
-import homework.entity.EnumStatus;
+import homework.util.enums.EnumStatus;
 import homework.entity.task.Task;
 import homework.exception.MappingException;
 import homework.service.TaskService;
@@ -11,9 +11,9 @@ import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static homework.util.MessageEnum.ERROR_RESULT;
-import static homework.util.MessageEnum.STATUS_ERROR;
-import static homework.util.PatternEnum.CHANGE_TASK_STATUS;
+import static homework.util.enums.MessageEnum.ERROR_RESULT;
+import static homework.util.enums.MessageEnum.STATUS_ERROR;
+import static homework.util.enums.PatternEnum.CHANGE_TASK_STATUS;
 
 @Component
 @RequiredArgsConstructor

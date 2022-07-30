@@ -1,6 +1,7 @@
 package homework.service;
 
 import com.sun.istack.NotNull;
+import homework.entity.project.Project;
 import homework.entity.task.Task;
 import homework.entity.task.TaskFilter;
 import homework.entity.task.Task_;
@@ -9,6 +10,7 @@ import homework.entity.user.User_;
 import homework.repository.TaskRepo;
 import homework.util.CustomPage;
 import homework.util.EnumStatus;
+import homework.util.Specifications;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -117,5 +119,13 @@ public class TaskService {
     private static Calendar getDateFormat(String stringDate) {
         LocalDate date = LocalDate.parse(stringDate, dateFormat);
         return GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));
+    }
+
+    public Page<Task> getTasksByUser(User user, Pageable pageable) {
+        return taskRepo.findAll(Specifications.getUserTasks(user),pageable);
+    }
+
+    public Page<Task> getTasksByProject(Project project, Pageable pageable) {
+        return taskRepo.findAll(Specifications.getProjectTasks(project),pageable);
     }
 }

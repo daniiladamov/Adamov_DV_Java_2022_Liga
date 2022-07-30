@@ -4,7 +4,10 @@ import homework.entity.project.Project;
 import homework.entity.project.ProjectGetDto;
 import homework.entity.project.ProjectSaveDto;
 import homework.entity.task.Task;
+import homework.entity.task.TaskGetDto;
 import homework.entity.task.TaskSaveDto;
+import homework.entity.user.User;
+import homework.entity.user.UserGetDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.ProjectService;
 import homework.service.RelationService;
@@ -31,6 +34,18 @@ public class ProjectController {
     @Value("${exception_message}")
     private String exceptionMessage;
 
+    @GetMapping("/{id}/tasks")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage){
+        Page<Task> tasks=relationService.getProjectTasks(id,customPage);
+        return dtoPageMapper.mapToPage(tasks,TaskGetDto.class);
+    }
+    @GetMapping("/{id}/users")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<UserGetDto> getUsers(@PathVariable Long id, CustomPage customPage){
+        Page<User> users=relationService.getProjectUsers(id,customPage);
+        return dtoPageMapper.mapToPage(users,UserGetDto.class);
+    }
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<ProjectGetDto> getProjects(CustomPage customPage){

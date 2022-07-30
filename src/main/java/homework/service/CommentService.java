@@ -5,6 +5,7 @@ import homework.entity.task.Task;
 import homework.exception.EntityNotFoundException;
 import homework.repository.CommentRepo;
 import homework.util.CustomPage;
+import homework.util.Specifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -49,5 +50,9 @@ public class CommentService {
             throw new EntityNotFoundException(
                     String.format(exceptionMessage, Task.class.getSimpleName(),id));
 
+    }
+
+    public Page<Comment> getComemntsByTask(Task task, Pageable pageable) {
+        return commentRepo.findAll(Specifications.getTaskComments(task),pageable);
     }
 }

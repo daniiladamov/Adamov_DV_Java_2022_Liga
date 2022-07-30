@@ -93,6 +93,7 @@ public class RelationService {
             Task taskInBd=taskOptional.get();
             task.setComment(taskInBd.getComment());
             task.setUser(taskInBd.getUser());
+            task.setProject(taskInBd.getProject());
             return taskService.updateTask(task);
         }
         else
@@ -116,9 +117,13 @@ public class RelationService {
         Optional<Task> taskOptional=taskService.getTask(id);
         if (taskOptional.isPresent()){
             Task task=taskOptional.get();
-            if (task.getProject().getTasks().size()==1){
-                entityManager.createNativeQuery("delete from project_user where user_id= :id")
-                        .setParameter("id",task.getUser().getId()).executeUpdate();
+            long taskForUserByProject=task.getUser().getTaskList().stream().
+                    filter(t->t.getProject().equals(task.getProject())).count();
+            if (taskForUserByProject==1){
+                entityManager.createNativeQuery("delete from project_user where project_id= :id and " +
+                                "user_id= :userId")
+                        .setParameter("id",task.getProject().getId())
+                        .setParameter("userId",task.getUser().getId()).executeUpdate();
             }
             taskService.removeTask(id);
         }
@@ -136,5 +141,53 @@ public class RelationService {
         else
             throw new EntityNotFoundException(
                 String.format(exceptionMessage,User.class.getSimpleName(), id));
+    }
+
+    public Page<Task> getUserTasks(Long id, CustomPage customPage) {
+        Optional<User> userOptional=userService.getUser(id);
+        if (userOptional.isPresent()){
+            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
+            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
+            return taskService.getTasksByUser(userOptional.get(),pageable);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,User.class.getSimpleName(), id));
+    }
+
+    public Page<Task> getProjectTasks(Long id, CustomPage customPage) {
+        Optional<Project> projectOptional=projectService.getProject(id);
+        if (projectOptional.isPresent()){
+            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
+            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
+            return taskService.getTasksByProject(projectOptional.get(),pageable);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,Project.class.getSimpleName(), id));
+    }
+
+    public Page<User> getProjectUsers(Long id, CustomPage customPage) {
+        Optional<Project> projectOptional=projectService.getProject(id);
+        if (projectOptional.isPresent()){
+            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
+            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
+            return userService.getUsersByProject(projectOptional.get(),pageable);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,Project.class.getSimpleName(), id));
+    }
+
+    public Page<Comment> getTaskComments(Long id, CustomPage customPage) {
+        Optional<Task> taskOptional=taskService.getTask(id);
+        if (taskOptional.isPresent()){
+            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
+            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
+            return commentService.getComemntsByTask(taskOptional.get(),pageable);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,Task.class.getSimpleName(), id));
     }
 }

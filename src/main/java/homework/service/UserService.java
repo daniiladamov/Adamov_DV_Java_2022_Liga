@@ -1,9 +1,11 @@
 package homework.service;
 
+import homework.entity.project.Project;
 import homework.entity.user.User;
 import homework.exception.EntityNotFoundException;
 import homework.repository.UserRepo;
 import homework.util.CustomPage;
+import homework.util.Specifications;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,5 +59,9 @@ public class UserService {
         Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
         Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
         return userRepo.findAll(pageable);
+    }
+
+    public Page<User> getUsersByProject(Project project, Pageable pageable) {
+        return userRepo.findAll(Specifications.getProjectUsers(project),pageable);
     }
 }

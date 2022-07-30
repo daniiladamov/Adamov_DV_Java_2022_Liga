@@ -63,7 +63,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserGetDto getUser(@PathVariable Long id) throws EntityNotFoundException {
+    public UserGetDto getUser(@PathVariable Long id) {
         Optional<User> user = userService.getUser(id);
         if (user.isPresent()) {
             return modelMapper.map(user.get(), UserGetDto.class);
@@ -75,8 +75,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserGetDto updateUser(@Valid @RequestBody UserSaveDto userSaveDto,
-                                                 @PathVariable Long id) throws EntityNotFoundException {
+    public UserGetDto updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
         User user = modelMapper.map(userSaveDto, User.class);
         user.setId(id);
         User userUpdate = userService.updateUser(user);

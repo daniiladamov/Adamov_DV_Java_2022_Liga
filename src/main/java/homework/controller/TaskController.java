@@ -1,6 +1,7 @@
 package homework.controller;
 
 import homework.entity.comment.Comment;
+import homework.entity.comment.CommentGetDto;
 import homework.entity.comment.CommentSaveDto;
 import homework.entity.task.Task;
 import homework.entity.task.TaskGetDto;
@@ -31,6 +32,13 @@ public class TaskController {
     @Value("${exception_message}")
     private String exceptionMessage;
 
+    @GetMapping("/{id}/comments")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<CommentGetDto> getComments(@PathVariable Long id, CustomPage customPage){
+        Page<Comment> comments=relationService.getTaskComments(id,customPage);
+        return dtoPageMapper.mapToPage(comments,CommentGetDto.class);
+    }
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<TaskGetDto> getTasks(CustomPage customPage) {
@@ -54,8 +62,6 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteTask(@PathVariable Long id){
         relationService.removeTask(id);
-        if(!taskService.removeTask(id))
-            throw new EntityNotFoundException(String.format(exceptionMessage,Task.class.getSimpleName(),id));
     }
 
     @PostMapping("/{id}/comments")

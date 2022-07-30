@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -20,7 +19,7 @@ public class UserSaveDto {
     private String lastName;
     private String surname;
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 4)
     private String login;
     @NotBlank
     @Size(min = 8)

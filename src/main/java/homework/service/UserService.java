@@ -38,7 +38,13 @@ public class UserService {
     public User updateUser(User user) {
         Optional<User> userInBd=userRepo.findById(user.getId());
         if (userInBd.isPresent()){
-            User updateUser = userRepo.save(user);
+            User oldUser=userInBd.get();
+            oldUser.setFirstName(user.getFirstName());
+            oldUser.setLastName(user.getLastName());
+            oldUser.setSurname(user.getSurname());
+            oldUser.setLogin(user.getLogin());
+            oldUser.setPassword(user.getPassword());
+            User updateUser = userRepo.save(oldUser);
             return updateUser;
         }
         else throw new EntityNotFoundException(String.format(exceptionMessage,

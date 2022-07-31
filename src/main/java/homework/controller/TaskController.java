@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -38,6 +39,7 @@ public class TaskController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<TaskGetDto> getTasks(CustomPage customPage) {
         Page<Task> tasks = taskService.getTasks(customPage);
         return tasks.map(t -> modelMapper.map(t, TaskGetDto.class));
@@ -56,6 +58,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteTask(@PathVariable Long id) {
         Optional<Task> taskOptional=taskService.getTask(id);
         taskService.removeTask(taskOptional,id);

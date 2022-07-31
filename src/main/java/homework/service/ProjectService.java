@@ -80,7 +80,6 @@ public class ProjectService {
             throw new EntityNotFoundException(
                     String.format(exceptionMessage,Project.class.getSimpleName(),projectId));
     }
-
     public Page<Project> getUserProjects(Optional<User> userOptional, Long id, CustomPage customPage) {
         if (userOptional.isPresent()){
             Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());

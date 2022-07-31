@@ -36,6 +36,7 @@ dependencies {
     annotationProcessor("org.hibernate:hibernate-jpamodelgen")
     implementation 'com.h2database:h2:2.1.214'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compileOnly 'org.springframework.boot:spring-boot-starter-security'
 
 }
 sourceSets.main.java.srcDirs += "${buildDir}/generated"

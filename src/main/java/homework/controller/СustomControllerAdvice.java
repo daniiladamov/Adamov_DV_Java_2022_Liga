@@ -46,9 +46,9 @@ public class СustomControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String validateFallResponse(ConstraintViolationException ex){
+    public String validateFallResponse(ConstraintViolationException ex) {
         Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
-        return constraintViolations.stream().map(e->e.getPropertyPath().toString()+":"
+        return constraintViolations.stream().map(e -> e.getPropertyPath().toString() + ":"
                 + e.getMessage()).collect(Collectors.joining("\n"));
 
     }

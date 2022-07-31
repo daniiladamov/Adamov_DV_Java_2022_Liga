@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,8 @@ public class TaskService {
     private EntityManager entityManager;
     @Value("${exception_message}")
     private String exceptionMessage;
-
+    @PostAuthorize("hasRole('ADMIN') || " +
+            "(returnObject.isPresent() && returnObject.get().user.login==authentication.name)")
     public Optional<Task> getTask(@NonNull Long id) {
         return taskRepo.findById(id);
     }
@@ -183,7 +185,7 @@ public class TaskService {
             throw new EntityNotFoundException(
                     String.format(exceptionMessage,Task.class.getSimpleName(),id));
     }
-
+    @PostAuthorize("hasRole('ADMIN') || returnObject.getContent().get(0).user.login==authentication.name")
     public Page<Task> getUserTasks(Optional<User> userOptional, Long id, CustomPage customPage) {
         if (userOptional.isPresent()){
             Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());

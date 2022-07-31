@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,14 +33,12 @@ public class UserController {
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
-
     @GetMapping("/{id}/projects")
     public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage) {
         Optional<User> userOptional=userService.getUser(id);
         Page<Project> projects = projectService.getUserProjects(userOptional,id, customPage);
         return projects.map(p -> modelMapper.map(p, ProjectGetDto.class));
     }
-
     @GetMapping("/{id}/tasks")
     public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage) {
         Optional<User> userOptional=userService.getUser(id);
@@ -48,6 +47,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<UserGetDto> getUsers(CustomPage customPage) {
         Page<User> users = userService.getUsers(customPage);
         return users.map(u -> modelMapper.map(u, UserGetDto.class));
@@ -59,7 +59,6 @@ public class UserController {
         User user = modelMapper.map(userSaveDto, User.class);
         return userService.createUser(user);
     }
-
     @GetMapping("/{id}")
     public UserGetDto getUser(@PathVariable Long id) {
         Optional<User> user = userService.getUser(id);
@@ -72,13 +71,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserGetDto updateUser(@Validated @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
         User user = modelMapper.map(userSaveDto, User.class);
         user.setId(id);
         User userUpdate = userService.updateUser(user);
         return modelMapper.map(userUpdate, UserGetDto.class);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         Optional<User> userOptional=userService.getUser(id);

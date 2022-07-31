@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +26,14 @@ public class UserService {
     @Value("${exception_message}")
     private String exceptionMessage;
     private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
 
     public Optional<User> getUser(@NonNull Long id) {
         return userRepo.findById(id);
     }
     @Transactional
     public Long createUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepo.save(user);
         return savedUser.getId();
     }
@@ -43,7 +46,7 @@ public class UserService {
             oldUser.setLastName(user.getLastName());
             oldUser.setSurname(user.getSurname());
             oldUser.setLogin(user.getLogin());
-            oldUser.setPassword(user.getPassword());
+            oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
             User updateUser = userRepo.save(oldUser);
             return updateUser;
         }

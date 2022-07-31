@@ -2,10 +2,7 @@ package homework.entity.user;
 
 import homework.entity.project.Project;
 import homework.entity.task.Task;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -21,6 +18,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "users",uniqueConstraints= @UniqueConstraint(columnNames={"login"}))
+@EqualsAndHashCode
 @NoArgsConstructor
 public class User {
     @Id
@@ -39,10 +37,14 @@ public class User {
     @Column(name = "login")
     @NotNull
     private String login;
-    @Size(min = 8)
     @NotNull
     @Column(name = "password")
     private String password;
+    @NotNull
+    @Column(name="role")
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @Fetch(FetchMode.SUBSELECT)
     private List<Task> taskList = new ArrayList<>();
@@ -53,5 +55,11 @@ public class User {
 
     public void addTask(@NonNull Task task) {
         taskList.add(task);
+    }
+
+    @PrePersist
+    public void addRole(){
+        if (role==null)
+            role=RoleEnum.ROLE_USER;
     }
 }

@@ -15,6 +15,7 @@ public abstract class User_ {
 	public static volatile SingularAttribute<User, String> firstName;
 	public static volatile SingularAttribute<User, String> lastName;
 	public static volatile SingularAttribute<User, String> password;
+	public static volatile SingularAttribute<User, RoleEnum> role;
 	public static volatile SetAttribute<User, Project> projects;
 	public static volatile SingularAttribute<User, String> surname;
 	public static volatile ListAttribute<User, Task> taskList;
@@ -24,6 +25,7 @@ public abstract class User_ {
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String PASSWORD = "password";
+	public static final String ROLE = "role";
 	public static final String PROJECTS = "projects";
 	public static final String SURNAME = "surname";
 	public static final String TASK_LIST = "taskList";

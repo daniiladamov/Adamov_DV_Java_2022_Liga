@@ -8,7 +8,6 @@ import homework.entity.user.User;
 import homework.entity.user.UserGetDto;
 import homework.entity.user.UserSaveDto;
 import homework.exception.EntityNotFoundException;
-import homework.exception.LoginAlreadyUsedException;
 import homework.service.RelationService;
 import homework.service.UserService;
 import homework.util.CustomPage;
@@ -19,10 +18,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -36,14 +36,14 @@ public class UserController {
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
-
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}/projects")
     @ResponseStatus(HttpStatus.OK)
     public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage){
         Page<Project> projects = relationService.getUserProjects(id, customPage);
         return dtoPageMapper.mapToPage(projects,ProjectGetDto.class);
     }
-
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}/tasks")
     @ResponseStatus(HttpStatus.OK)
     public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage){
@@ -60,13 +60,12 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createUser(@Valid @RequestBody UserSaveDto userSaveDto, BindingResult bindingResult)
-    throws LoginAlreadyUsedException {
+    public Long createUser(@Validated @RequestBody UserSaveDto userSaveDto, BindingResult bindingResult) {
         userValidator.validate(userSaveDto,bindingResult);
         User user = modelMapper.map(userSaveDto, User.class);
         return userService.createUser(user);
     }
-
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserGetDto getUser(@PathVariable Long id) {
@@ -81,7 +80,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserGetDto updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
+    public UserGetDto updateUser(@Validated @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
         User user = modelMapper.map(userSaveDto, User.class);
         user.setId(id);
         User userUpdate = userService.updateUser(user);

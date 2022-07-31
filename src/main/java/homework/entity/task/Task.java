@@ -4,6 +4,7 @@ import homework.entity.comment.Comment;
 import homework.entity.project.Project;
 import homework.entity.user.User;
 import homework.util.enums.EnumStatus;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import java.util.Set;
 @Entity
 @Table(name="tasks")
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

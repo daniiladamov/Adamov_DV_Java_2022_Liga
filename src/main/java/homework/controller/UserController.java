@@ -8,67 +8,59 @@ import homework.entity.user.User;
 import homework.entity.user.UserGetDto;
 import homework.entity.user.UserSaveDto;
 import homework.exception.EntityNotFoundException;
-import homework.exception.LoginAlreadyUsedException;
-import homework.service.RelationService;
+import homework.service.ProjectService;
+import homework.service.TaskService;
 import homework.service.UserService;
 import homework.util.CustomPage;
-import homework.util.DtoPageMapper;
-import homework.util.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
-    private final UserValidator userValidator;
-    private final DtoPageMapper dtoPageMapper;
-    private final RelationService relationService;
+    private final TaskService taskService;
+    private final ProjectService projectService;
     private final UserService userService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
 
     @GetMapping("/{id}/projects")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage){
-        Page<Project> projects = relationService.getUserProjects(id, customPage);
-        return dtoPageMapper.mapToPage(projects,ProjectGetDto.class);
+    public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage) {
+        Optional<User> userOptional=userService.getUser(id);
+        Page<Project> projects = projectService.getUserProjects(userOptional,id, customPage);
+        return projects.map(p -> modelMapper.map(p, ProjectGetDto.class));
     }
 
     @GetMapping("/{id}/tasks")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage){
-        Page<Task> tasks=relationService.getUserTasks(id,customPage);
-        return dtoPageMapper.mapToPage(tasks,TaskGetDto.class);
+    public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage) {
+        Optional<User> userOptional=userService.getUser(id);
+        Page<Task> tasks = taskService.getUserTasks(userOptional,id, customPage);
+        return tasks.map(t -> modelMapper.map(t, TaskGetDto.class));
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Page<UserGetDto> getUsers(CustomPage customPage) {
         Page<User> users = userService.getUsers(customPage);
-        return dtoPageMapper.mapToPage(users, UserGetDto.class);
+        return users.map(u -> modelMapper.map(u, UserGetDto.class));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createUser(@Valid @RequestBody UserSaveDto userSaveDto, BindingResult bindingResult)
-    throws LoginAlreadyUsedException {
-        userValidator.validate(userSaveDto,bindingResult);
+    public Long createUser(@Validated @RequestBody UserSaveDto userSaveDto){
         User user = modelMapper.map(userSaveDto, User.class);
         return userService.createUser(user);
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public UserGetDto getUser(@PathVariable Long id) {
         Optional<User> user = userService.getUser(id);
         if (user.isPresent()) {
@@ -80,16 +72,16 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserGetDto updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
+    public UserGetDto updateUser(@Validated @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
         User user = modelMapper.map(userSaveDto, User.class);
         user.setId(id);
         User userUpdate = userService.updateUser(user);
         return modelMapper.map(userUpdate, UserGetDto.class);
     }
+
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteUser(@PathVariable Long id) {
-        relationService.deleteUser(id);
+        Optional<User> userOptional=userService.getUser(id);
+        userService.deleteUser(userOptional,id);
     }
 }

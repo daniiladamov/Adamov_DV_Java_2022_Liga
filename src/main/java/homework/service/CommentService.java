@@ -35,8 +35,7 @@ public class CommentService {
         return commentRepo.findById(id);
     }
 
-    @Transactional
-    public Comment create(Comment comment) {
+    private Comment create(Comment comment) {
         return commentRepo.save(comment);
 
     }
@@ -52,7 +51,39 @@ public class CommentService {
 
     }
 
-    public Page<Comment> getComemntsByTask(Task task, Pageable pageable) {
+    private Page<Comment> getCommentsByTask(Task task, Pageable pageable) {
         return commentRepo.findAll(Specifications.getTaskComments(task),pageable);
+    }
+    @Transactional
+    public Long createComment(Comment comment, Optional<Task> taskOptional, Long taskId) {
+        if (taskOptional.isPresent()){
+            comment.setTask(taskOptional.get());
+            return create(comment).getId();
+        }
+        else
+            throw new EntityNotFoundException(String.format(exceptionMessage,Task.class.getSimpleName(),taskId));
+    }
+
+    @Transactional
+    public Comment updateComment(Optional<Comment> commentOptional, Comment comment) {
+        if (commentOptional.isPresent()){
+            Comment commentInBd=commentOptional.get();
+            comment.setTask(commentInBd.getTask());
+            return create(comment);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,Comment.class.getSimpleName(),comment.getId()));
+    }
+
+    public Page<Comment> getTaskComments(Optional<Task> taskOptional, Long id, CustomPage customPage) {
+        if (taskOptional.isPresent()){
+            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
+            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
+            return getCommentsByTask(taskOptional.get(),pageable);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,Task.class.getSimpleName(), id));
     }
 }

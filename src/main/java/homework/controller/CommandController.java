@@ -1,14 +1,12 @@
 package homework.controller;
 
 import homework.service.CommandService;
-import homework.util.CommandEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,17 +30,6 @@ public class CommandController {
      */
     @GetMapping("/command")
     public String responseForCommand(@RequestParam Map<String, String> commandMap) {
-        String method = commandMap.get("method");
-        CommandEnum commandEnum;
-        try {
-            commandEnum = CommandEnum.valueOf(method.toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            commandEnum = CommandEnum.BAD;
-        }
-        Optional<String> cmd = Optional.ofNullable(commandMap.get("cmd"));
-        if (cmd.isEmpty())
-            return "В запросе необходимо передать параметр 'cmd'";
-        else
-            return commandService.getMessage(commandEnum, cmd.get());
+        return commandService.executeCommand(commandMap);
     }
 }

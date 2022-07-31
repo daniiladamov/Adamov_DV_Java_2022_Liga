@@ -5,6 +5,9 @@ import homework.util.CommandEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class CommandService {
@@ -42,5 +45,20 @@ public class CommandService {
             }
         }
         return commandExecutor.executeCmd(command);
+    }
+
+    public String executeCommand(Map<String, String> commandMap) {
+        String method = commandMap.get("method");
+        CommandEnum commandEnum;
+        try {
+            commandEnum = CommandEnum.valueOf(method.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            commandEnum = CommandEnum.BAD;
+        }
+        Optional<String> cmd = Optional.ofNullable(commandMap.get("cmd"));
+        if (cmd.isEmpty())
+            return "В запросе необходимо передать параметр 'cmd'";
+        else
+            return getMessage(commandEnum, cmd.get());
     }
 }

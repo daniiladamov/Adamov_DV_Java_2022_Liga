@@ -5,7 +5,6 @@ import homework.entity.comment.CommentGetDto;
 import homework.entity.comment.CommentSaveDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.CommentService;
-import homework.service.RelationService;
 import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,7 +19,6 @@ import java.util.Optional;
 @RequestMapping("/v2/comments")
 @RequiredArgsConstructor
 public class CommentController {
-    private final RelationService relationService;
     private final CommentService commentService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
@@ -54,7 +52,8 @@ public class CommentController {
                                        @Valid @RequestBody CommentSaveDto commentSaveDto) {
         Comment comment = modelMapper.map(commentSaveDto, Comment.class);
         comment.setId(id);
-        Comment updateComment = relationService.updateComment(comment);
+        Optional<Comment> commentOptional=commentService.getComment(comment.getId());
+        Comment updateComment = commentService.updateComment(commentOptional,comment);
         return modelMapper.map(updateComment, CommentGetDto.class);
     }
 

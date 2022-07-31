@@ -7,7 +7,7 @@ import homework.entity.task.Task;
 import homework.entity.task.TaskGetDto;
 import homework.entity.task.TaskSaveDto;
 import homework.exception.EntityNotFoundException;
-import homework.service.RelationService;
+import homework.service.CommentService;
 import homework.service.TaskService;
 import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +25,15 @@ import java.util.Optional;
 @RequestMapping("/v2/tasks")
 public class TaskController {
     private final TaskService taskService;
-    private final RelationService relationService;
+    private final CommentService commentService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
 
     @GetMapping("/{id}/comments")
     public Page<CommentGetDto> getComments(@PathVariable Long id, CustomPage customPage) {
-        Page<Comment> comments = relationService.getTaskComments(id, customPage);
+        Optional<Task> taskOptional=taskService.getTask(id);
+        Page<Comment> comments = commentService.getTaskComments(taskOptional,id, customPage);
         return comments.map(c -> modelMapper.map(c, CommentGetDto.class));
     }
 
@@ -56,7 +57,8 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id) {
-        relationService.removeTask(id);
+        Optional<Task> taskOptional=taskService.getTask(id);
+        taskService.removeTask(taskOptional,id);
     }
 
     @PostMapping("/{id}/comments")
@@ -64,14 +66,16 @@ public class TaskController {
     public Long createCommentForTask(@PathVariable Long id, @Valid @RequestBody CommentSaveDto commentSaveDto)
             throws EntityNotFoundException {
         Comment comment = modelMapper.map(commentSaveDto, Comment.class);
-        return relationService.createComment(comment, id);
+        Optional<Task> taskOptional=taskService.getTask(id);
+        return commentService.createComment(comment, taskOptional,id);
     }
 
     @PutMapping("/{id}")
     public TaskGetDto updateTask(@PathVariable Long id, @RequestBody TaskSaveDto taskSaveDto) {
         Task task = modelMapper.map(taskSaveDto, Task.class);
         task.setId(id);
-        Task taskUpdate = relationService.updateTask(task);
+        Optional<Task> taskOptional=taskService.getTask(task.getId());
+        Task taskUpdate = taskService.updateTask(taskOptional,task);
         return modelMapper.map(taskUpdate, TaskGetDto.class);
     }
 }

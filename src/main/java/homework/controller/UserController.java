@@ -8,7 +8,8 @@ import homework.entity.user.User;
 import homework.entity.user.UserGetDto;
 import homework.entity.user.UserSaveDto;
 import homework.exception.EntityNotFoundException;
-import homework.service.RelationService;
+import homework.service.ProjectService;
+import homework.service.TaskService;
 import homework.service.UserService;
 import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
-    private final RelationService relationService;
+    private final TaskService taskService;
+    private final ProjectService projectService;
     private final UserService userService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
@@ -33,13 +35,15 @@ public class UserController {
 
     @GetMapping("/{id}/projects")
     public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage) {
-        Page<Project> projects = relationService.getUserProjects(id, customPage);
+        Optional<User> userOptional=userService.getUser(id);
+        Page<Project> projects = projectService.getUserProjects(userOptional,id, customPage);
         return projects.map(p -> modelMapper.map(p, ProjectGetDto.class));
     }
 
     @GetMapping("/{id}/tasks")
     public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage) {
-        Page<Task> tasks = relationService.getUserTasks(id, customPage);
+        Optional<User> userOptional=userService.getUser(id);
+        Page<Task> tasks = taskService.getUserTasks(userOptional,id, customPage);
         return tasks.map(t -> modelMapper.map(t, TaskGetDto.class));
     }
 
@@ -77,6 +81,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
-        relationService.deleteUser(id);
+        Optional<User> userOptional=userService.getUser(id);
+        userService.deleteUser(userOptional,id);
     }
 }

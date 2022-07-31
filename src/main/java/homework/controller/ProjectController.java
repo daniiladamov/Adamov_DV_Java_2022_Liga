@@ -10,7 +10,8 @@ import homework.entity.user.User;
 import homework.entity.user.UserGetDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.ProjectService;
-import homework.service.RelationService;
+import homework.service.TaskService;
+import homework.service.UserService;
 import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,21 +27,24 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/v2/projects")
 public class ProjectController {
+    private final UserService userService;
+    private final TaskService taskService;
     private final ProjectService projectService;
-    private final RelationService relationService;
     private final ModelMapper modelMapper;
     @Value("${exception_message}")
     private String exceptionMessage;
 
     @GetMapping("/{id}/tasks")
     public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage) {
-        Page<Task> tasks = relationService.getProjectTasks(id, customPage);
+        Optional<Project> projectOptional=projectService.getProject(id);
+        Page<Task> tasks = taskService.getProjectTasks(projectOptional,id, customPage);
         return tasks.map(t -> modelMapper.map(t, TaskGetDto.class));
     }
 
     @GetMapping("/{id}/users")
     public Page<UserGetDto> getUsers(@PathVariable Long id, CustomPage customPage) {
-        Page<User> users = relationService.getProjectUsers(id, customPage);
+        Optional<Project> projectOptional=projectService.getProject(id);
+        Page<User> users = userService.getProjectUsers(projectOptional,id, customPage);
         return users.map(u -> modelMapper.map(u, UserGetDto.class));
     }
 
@@ -81,15 +85,18 @@ public class ProjectController {
     @DeleteMapping("/{id}")
     public void deleteProject(@PathVariable Long id)
             throws EntityNotFoundException {
-        relationService.deleteProject(id);
+        Optional<Project> projectOptional=projectService.getProject(id);
+        projectService.deleteProject(projectOptional,id);
     }
 
     @PostMapping("/{id}/tasks")
-    public Long addTask(@Valid @RequestBody TaskSaveDto taskSaveDto, @PathVariable Long id,
+    public Long addTask(@Valid @RequestBody TaskSaveDto taskSaveDto, @PathVariable(name = "id") Long projectId,
                         @RequestParam(name = "user-id") Long userId)
             throws EntityNotFoundException {
         Task task = modelMapper.map(taskSaveDto, Task.class);
-        return relationService.createTask(task, userId, id);
+        Optional<User> userOptional = userService.getUser(userId);
+        Optional<Project> projectOptional=projectService.getProject(projectId);
+        return taskService.createTask(task,userOptional,projectOptional, userId,projectId);
     }
 
 }

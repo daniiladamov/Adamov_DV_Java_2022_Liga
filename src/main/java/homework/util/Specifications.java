@@ -1,9 +1,9 @@
 package homework.util;
 
-import homework.entity.comment.Comment;
-import homework.entity.comment.Comment_;
-import homework.entity.project.Project;
-import homework.entity.project.Project_;
+import homework.entity.Comment;
+import homework.entity.Comment_;
+import homework.entity.Project;
+import homework.entity.Project_;
 import homework.entity.task.Task;
 import homework.entity.task.Task_;
 import homework.entity.user.User;

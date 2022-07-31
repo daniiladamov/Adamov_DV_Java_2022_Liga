@@ -1,4 +1,4 @@
-package homework.entity.comment;
+package homework.entity;
 
 import homework.entity.task.Task;
 import javax.annotation.Generated;

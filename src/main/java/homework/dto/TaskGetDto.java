@@ -1,4 +1,4 @@
-package homework.entity.task;
+package homework.dto;
 
 import homework.util.enums.EnumStatus;
 import lombok.EqualsAndHashCode;

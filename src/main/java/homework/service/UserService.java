@@ -1,6 +1,6 @@
 package homework.service;
 
-import homework.entity.project.Project;
+import homework.entity.Project;
 import homework.entity.user.User;
 import homework.exception.EntityNotFoundException;
 import homework.repository.UserRepo;

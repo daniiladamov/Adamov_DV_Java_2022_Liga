@@ -1,4 +1,4 @@
-package homework.entity.project;
+package homework.entity;
 
 import homework.entity.task.Task;
 import homework.entity.user.User;

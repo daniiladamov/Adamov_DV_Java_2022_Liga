@@ -1,11 +1,11 @@
 package homework.controller;
 
-import homework.entity.comment.Comment;
-import homework.entity.comment.CommentGetDto;
-import homework.entity.comment.CommentSaveDto;
+import homework.entity.Comment;
+import homework.dto.CommentGetDto;
+import homework.dto.CommentSaveDto;
 import homework.entity.task.Task;
-import homework.entity.task.TaskGetDto;
-import homework.entity.task.TaskSaveDto;
+import homework.dto.TaskGetDto;
+import homework.dto.TaskSaveDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.CommentService;
 import homework.service.TaskService;

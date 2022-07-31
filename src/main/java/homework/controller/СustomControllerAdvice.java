@@ -1,5 +1,6 @@
 package homework.controller;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import homework.exception.EntityNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,10 @@ public class СustomControllerAdvice extends ResponseEntityExceptionHandler {
         return constraintViolations.stream().map(e -> e.getPropertyPath().toString() + ":"
                 + e.getMessage()).collect(Collectors.joining("\n"));
 
+    }
+    @ExceptionHandler(JWTVerificationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String verificationJwtFalls(){
+        return "JWT-токен не прошел верификацию на сервере приложения";
     }
 }

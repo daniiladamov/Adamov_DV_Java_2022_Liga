@@ -1,15 +1,14 @@
-package homework.entity.comment;
+package homework.dto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-
 @NoArgsConstructor
 @Getter
 @Setter
-public class CommentSaveDto {
-    @NotBlank
+public class CommentGetDto {
+    private Long id;
     private String content;
 }

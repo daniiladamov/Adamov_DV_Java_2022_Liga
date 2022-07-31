@@ -1,7 +1,7 @@
 package homework.entity.task;
 
-import homework.entity.comment.Comment;
-import homework.entity.project.Project;
+import homework.entity.Comment;
+import homework.entity.Project;
 import homework.entity.user.User;
 import homework.util.enums.EnumStatus;
 import java.util.Date;

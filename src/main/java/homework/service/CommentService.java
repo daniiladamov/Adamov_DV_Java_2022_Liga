@@ -1,6 +1,6 @@
 package homework.service;
 
-import homework.entity.comment.Comment;
+import homework.entity.Comment;
 import homework.entity.task.Task;
 import homework.exception.EntityNotFoundException;
 import homework.repository.CommentRepo;

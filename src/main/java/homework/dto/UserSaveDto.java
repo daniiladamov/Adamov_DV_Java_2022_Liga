@@ -1,4 +1,4 @@
-package homework.entity.user;
+package homework.dto;
 
 import homework.util.validator.UniqueLogin;
 import lombok.AllArgsConstructor;

@@ -1,13 +1,14 @@
 package homework.controller;
 
-import homework.entity.project.Project;
-import homework.entity.project.ProjectGetDto;
+import homework.entity.Project;
+import homework.dto.ProjectGetDto;
 import homework.entity.task.Task;
-import homework.entity.task.TaskGetDto;
+import homework.dto.TaskGetDto;
 import homework.entity.user.User;
-import homework.entity.user.UserGetDto;
-import homework.entity.user.UserSaveDto;
+import homework.dto.UserGetDto;
+import homework.dto.UserSaveDto;
 import homework.exception.EntityNotFoundException;
+import homework.security.JwtGenerator;
 import homework.service.ProjectService;
 import homework.service.TaskService;
 import homework.service.UserService;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
+    private final JwtGenerator jwtGenerator;
     private final TaskService taskService;
     private final ProjectService projectService;
     private final UserService userService;
@@ -52,12 +54,13 @@ public class UserController {
         Page<User> users = userService.getUsers(customPage);
         return users.map(u -> modelMapper.map(u, UserGetDto.class));
     }
-
+//@todo: класть больше данных в jwt: fname, lname and login!!!
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createUser(@Validated @RequestBody UserSaveDto userSaveDto){
+    public String createUser(@Validated @RequestBody UserSaveDto userSaveDto){
         User user = modelMapper.map(userSaveDto, User.class);
-        return userService.createUser(user);
+        userService.createUser(user);
+        return jwtGenerator.generateToken(user.getLogin());
     }
     @GetMapping("/{id}")
     public UserGetDto getUser(@PathVariable Long id) {

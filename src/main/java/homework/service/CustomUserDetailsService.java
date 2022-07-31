@@ -1,7 +1,7 @@
 package homework.service;
 
 import homework.entity.user.User;
-import homework.entity.user.UserAppDto;
+import homework.dto.UserAppDto;
 import homework.repository.UserRepo;
 import homework.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;

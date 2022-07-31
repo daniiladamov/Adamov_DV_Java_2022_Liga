@@ -1,6 +1,6 @@
 package homework.controller;
 
-import homework.entity.task.TaskGetDto;
+import homework.dto.TaskGetDto;
 import homework.entity.task.TaskFilter;
 import homework.service.CommandService;
 import homework.service.TaskService;
@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeParseException;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
+@PreAuthorize("hasRole('ADMIN')")
 public class CommandController {
     private final CommandService commandService;
     private final TaskService taskService;

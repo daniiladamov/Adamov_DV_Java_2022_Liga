@@ -1,4 +1,4 @@
-package homework.entity.project;
+package homework.entity;
 
 import com.sun.istack.NotNull;
 import homework.entity.task.Task;

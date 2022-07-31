@@ -1,6 +1,6 @@
 package homework.security;
 
-import homework.entity.user.UserAppDto;
+import homework.dto.UserAppDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

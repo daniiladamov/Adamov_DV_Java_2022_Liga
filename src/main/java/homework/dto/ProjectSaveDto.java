@@ -1,14 +1,16 @@
-package homework.entity.project;
+package homework.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
-public class ProjectGetDto {
-    private Long id;
+@NoArgsConstructor
+public class ProjectSaveDto {
+    @NotBlank
     private String title;
     private String description;
 }

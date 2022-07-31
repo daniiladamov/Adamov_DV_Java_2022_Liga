@@ -1,13 +1,13 @@
 package homework.controller;
 
-import homework.entity.project.Project;
-import homework.entity.project.ProjectGetDto;
-import homework.entity.project.ProjectSaveDto;
+import homework.entity.Project;
+import homework.dto.ProjectGetDto;
+import homework.dto.ProjectSaveDto;
 import homework.entity.task.Task;
-import homework.entity.task.TaskGetDto;
-import homework.entity.task.TaskSaveDto;
+import homework.dto.TaskGetDto;
+import homework.dto.TaskSaveDto;
 import homework.entity.user.User;
-import homework.entity.user.UserGetDto;
+import homework.dto.UserGetDto;
 import homework.exception.EntityNotFoundException;
 import homework.service.ProjectService;
 import homework.service.TaskService;

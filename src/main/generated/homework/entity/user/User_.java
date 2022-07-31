@@ -1,6 +1,6 @@
 package homework.entity.user;
 
-import homework.entity.project.Project;
+import homework.entity.Project;
 import homework.entity.task.Task;
 import javax.annotation.Generated;
 import javax.persistence.metamodel.ListAttribute;

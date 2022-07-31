@@ -15,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-//@Configuration
-//@EnableGlobalMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter
 {
@@ -27,40 +25,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
         auth.userDetailsService(detailsService).
                 passwordEncoder(getPasswordEncoder());
     }
-//
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.
                 csrf().disable().
                 authorizeRequests().
                 antMatchers(HttpMethod.POST,"/v2/users").anonymous().
-//                antMatchers("v2/users/{id}","v2/tasks/{id}").hasAnyRole("USER","ADMIN").
-                antMatchers("/**").hasRole("ADMIN").
-
-
-//                anyRequest().authenticated().
+                anyRequest().authenticated().
                 and().
                 formLogin().defaultSuccessUrl("/swagger-ui/#").
                 and().
                 httpBasic(Customizer.withDefaults()).
                 logout().logoutUrl("/logout").logoutSuccessUrl("/login");
     }
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
-//        return http.
-//        csrf().disable().
-//                authorizeRequests().
-//                antMatchers(HttpMethod.POST,"/v2/users").anonymous().
-//                antMatchers("v2/users/**","v2/tasks/**").hasAnyRole("USER","ADMIN").
-//                antMatchers("/v2/**").hasRole("ADMIN").
-//                and().
-//                formLogin().defaultSuccessUrl("/swagger-ui/#").
-////                and().
-////                httpBasic().
-//                and().
-//                logout().logoutUrl("/logout").logoutSuccessUrl("/login").and().build();
-//    }
-
     @Bean
     public PasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder(8);

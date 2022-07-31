@@ -1,5 +1,6 @@
 package homework.entity.user;
 
+import homework.util.validator.UniqueLogin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class UserSaveDto {
     private String surname;
     @NotBlank
     @Size(min = 4)
+    @UniqueLogin
     private String login;
     @NotBlank
     @Size(min = 8)

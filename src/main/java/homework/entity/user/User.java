@@ -18,7 +18,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "users",uniqueConstraints= @UniqueConstraint(columnNames={"login"}))
-@EqualsAndHashCode
 @NoArgsConstructor
 public class User {
     @Id

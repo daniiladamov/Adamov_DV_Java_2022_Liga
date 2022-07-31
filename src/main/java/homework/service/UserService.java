@@ -13,21 +13,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
+    @PersistenceContext
+    private final EntityManager entityManager;
     @Value("${exception_message}")
     private String exceptionMessage;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-
+    @PostAuthorize("hasRole('ADMIN') || " +
+            "(returnObject.isPresent() && returnObject.get().login==authentication.name)")
     public Optional<User> getUser(@NonNull Long id) {
         return userRepo.findById(id);
     }
@@ -53,8 +59,7 @@ public class UserService {
         else throw new EntityNotFoundException(String.format(exceptionMessage,
                 User.class.getSimpleName(),user.getId()));
     }
-    @Transactional
-    public User deleteUser(Long id) {
+    private User deleteUser(Long id) {
         Optional<User> userInBd=userRepo.findById(id);
         if (userInBd.isPresent()){
             userRepo.delete(userInBd.get());
@@ -70,11 +75,34 @@ public class UserService {
         return userRepo.findAll(pageable);
     }
 
-    public Page<User> getUsersByProject(Project project, Pageable pageable) {
+    private Page<User> getUsersByProject(Project project, Pageable pageable) {
         return userRepo.findAll(Specifications.getProjectUsers(project),pageable);
     }
 
     public Optional<User> getUserByLogin(String login){
         return userRepo.findByLogin(login);
+    }
+    @Transactional
+    public void deleteUser(Optional<User> userOptional, Long userId){
+
+        if (userOptional.isPresent()){
+            entityManager.createNativeQuery("delete from project_user where user_id= :id")
+                    .setParameter("id",userId).executeUpdate();
+            deleteUser(userId);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,User.class.getSimpleName(),userId));
+    }
+
+    public Page<User> getProjectUsers(Optional<Project> projectOptional, Long id, CustomPage customPage) {
+        if (projectOptional.isPresent()){
+            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
+            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
+            return getUsersByProject(projectOptional.get(),pageable);
+        }
+        else
+            throw new EntityNotFoundException(
+                    String.format(exceptionMessage,Project.class.getSimpleName(), id));
     }
 }

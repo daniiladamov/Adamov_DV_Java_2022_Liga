@@ -3,7 +3,6 @@ package homework.entity.project;
 import com.sun.istack.NotNull;
 import homework.entity.task.Task;
 import homework.entity.user.User;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

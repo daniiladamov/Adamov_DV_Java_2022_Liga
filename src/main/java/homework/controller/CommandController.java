@@ -64,9 +64,9 @@ public class CommandController {
      * @return  список задачи пользователя с наибольшим количеством задач. Опционально моежт быть отфильтрован.
      */
     @GetMapping("/tasks")
-    public ResponseEntity<List<TaskGetDto>> getTaskMaxCount(TaskFilter taskFilter){
-        return new ResponseEntity<>(taskService.getTaskMaxCount(taskFilter).stream().
-                map(task->modelMapper.map(task, TaskGetDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+    public List<TaskGetDto> getTaskMaxCount(TaskFilter taskFilter){
+        return taskService.getTaskMaxCount(taskFilter).stream().
+                map(task->modelMapper.map(task, TaskGetDto.class)).collect(Collectors.toList());
     }
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity getException(){

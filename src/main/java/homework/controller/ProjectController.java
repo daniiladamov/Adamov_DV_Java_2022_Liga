@@ -35,19 +35,16 @@ public class ProjectController {
     private String exceptionMessage;
 
     @GetMapping("/{id}/tasks")
-    @ResponseStatus(HttpStatus.OK)
     public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage){
         Page<Task> tasks=relationService.getProjectTasks(id,customPage);
         return dtoPageMapper.mapToPage(tasks,TaskGetDto.class);
     }
     @GetMapping("/{id}/users")
-    @ResponseStatus(HttpStatus.OK)
     public Page<UserGetDto> getUsers(@PathVariable Long id, CustomPage customPage){
         Page<User> users=relationService.getProjectUsers(id,customPage);
         return dtoPageMapper.mapToPage(users,UserGetDto.class);
     }
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Page<ProjectGetDto> getProjects(CustomPage customPage){
         Page<Project> projects=projectService.getProjects(customPage);
         return dtoPageMapper.mapToPage(projects,ProjectGetDto.class);
@@ -60,7 +57,6 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ProjectGetDto getProject(@PathVariable Long id) throws EntityNotFoundException {
         Optional<Project> project= projectService.getProject(id);
         if (project.isPresent()){
@@ -73,7 +69,6 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ProjectGetDto updateProject(@Valid @RequestBody ProjectSaveDto projectSaveDto,
                                                        @PathVariable Long id)
             throws EntityNotFoundException{
@@ -83,13 +78,11 @@ public class ProjectController {
         return modelMapper.map(projectUpdate,ProjectGetDto.class);
     }
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable Long id)
             throws EntityNotFoundException{
         relationService.deleteProject(id);
     }
     @PostMapping("/{id}/tasks")
-    @ResponseStatus(HttpStatus.OK)
     public Long addTask(@Valid @RequestBody TaskSaveDto taskSaveDto, @PathVariable Long id,
                         @RequestParam(name="user-id") Long userId)
             throws EntityNotFoundException {

@@ -38,21 +38,18 @@ public class UserController {
     private String exceptionMessage;
 
     @GetMapping("/{id}/projects")
-    @ResponseStatus(HttpStatus.OK)
     public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage){
         Page<Project> projects = relationService.getUserProjects(id, customPage);
         return dtoPageMapper.mapToPage(projects,ProjectGetDto.class);
     }
 
     @GetMapping("/{id}/tasks")
-    @ResponseStatus(HttpStatus.OK)
     public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage){
         Page<Task> tasks=relationService.getUserTasks(id,customPage);
         return dtoPageMapper.mapToPage(tasks,TaskGetDto.class);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Page<UserGetDto> getUsers(CustomPage customPage) {
         Page<User> users = userService.getUsers(customPage);
         return dtoPageMapper.mapToPage(users, UserGetDto.class);
@@ -68,7 +65,6 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public UserGetDto getUser(@PathVariable Long id) {
         Optional<User> user = userService.getUser(id);
         if (user.isPresent()) {
@@ -80,7 +76,6 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public UserGetDto updateUser(@Valid @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
         User user = modelMapper.map(userSaveDto, User.class);
         user.setId(id);
@@ -88,7 +83,6 @@ public class UserController {
         return modelMapper.map(userUpdate, UserGetDto.class);
     }
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteUser(@PathVariable Long id) {
         relationService.deleteUser(id);
     }

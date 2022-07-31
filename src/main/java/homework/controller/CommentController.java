@@ -30,14 +30,12 @@ public class CommentController {
     private String exceptionMessage;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Page<CommentGetDto> getComment(CustomPage customPage) {
         Page<Comment> comments = commentService.getComments(customPage);
         return dtoPageMapper.mapToPage(comments, CommentGetDto.class);
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public CommentGetDto getComment(@PathVariable Long id){
         Optional<Comment> comment = commentService.getComment(id);
         if (comment.isPresent()) {
@@ -50,13 +48,11 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public void removeComment(@PathVariable Long id){
         commentService.remove(id);
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public CommentGetDto updateComment(@PathVariable Long id,
                                        @Valid @RequestBody CommentSaveDto commentSaveDto){
         Comment comment=modelMapper.map(commentSaveDto,Comment.class);

@@ -33,21 +33,18 @@ public class TaskController {
     private String exceptionMessage;
 
     @GetMapping("/{id}/comments")
-    @ResponseStatus(HttpStatus.OK)
     public Page<CommentGetDto> getComments(@PathVariable Long id, CustomPage customPage){
         Page<Comment> comments=relationService.getTaskComments(id,customPage);
         return dtoPageMapper.mapToPage(comments,CommentGetDto.class);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Page<TaskGetDto> getTasks(CustomPage customPage) {
         Page<Task> tasks = taskService.getTasks(customPage);
         return dtoPageMapper.mapToPage(tasks, TaskGetDto.class);
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public TaskGetDto getTask(@PathVariable Long id){
         Optional<Task> task = taskService.getTask(id);
         if (task.isPresent()) {
@@ -59,7 +56,6 @@ public class TaskController {
         }
     }
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteTask(@PathVariable Long id){
         relationService.removeTask(id);
     }
@@ -73,7 +69,6 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public TaskGetDto updateTask(@PathVariable Long id, @RequestBody TaskSaveDto taskSaveDto){
         Task task=modelMapper.map(taskSaveDto,Task.class);
         task.setId(id);

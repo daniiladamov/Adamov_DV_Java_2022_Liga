@@ -12,7 +12,6 @@ import homework.exception.LoginAlreadyUsedException;
 import homework.service.RelationService;
 import homework.service.UserService;
 import homework.util.CustomPage;
-import homework.util.DtoPageMapper;
 import homework.util.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,7 +29,6 @@ import java.util.Optional;
 @RequestMapping("/v2/users")
 public class UserController {
     private final UserValidator userValidator;
-    private final DtoPageMapper dtoPageMapper;
     private final RelationService relationService;
     private final UserService userService;
     private final ModelMapper modelMapper;
@@ -38,28 +36,28 @@ public class UserController {
     private String exceptionMessage;
 
     @GetMapping("/{id}/projects")
-    public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage){
+    public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage) {
         Page<Project> projects = relationService.getUserProjects(id, customPage);
-        return dtoPageMapper.mapToPage(projects,ProjectGetDto.class);
+        return projects.map(p -> modelMapper.map(p, ProjectGetDto.class));
     }
 
     @GetMapping("/{id}/tasks")
-    public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage){
-        Page<Task> tasks=relationService.getUserTasks(id,customPage);
-        return dtoPageMapper.mapToPage(tasks,TaskGetDto.class);
+    public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage) {
+        Page<Task> tasks = relationService.getUserTasks(id, customPage);
+        return tasks.map(t -> modelMapper.map(t, TaskGetDto.class));
     }
 
     @GetMapping
     public Page<UserGetDto> getUsers(CustomPage customPage) {
         Page<User> users = userService.getUsers(customPage);
-        return dtoPageMapper.mapToPage(users, UserGetDto.class);
+        return users.map(u -> modelMapper.map(u, UserGetDto.class));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Long createUser(@Valid @RequestBody UserSaveDto userSaveDto, BindingResult bindingResult)
-    throws LoginAlreadyUsedException {
-        userValidator.validate(userSaveDto,bindingResult);
+            throws LoginAlreadyUsedException {
+        userValidator.validate(userSaveDto, bindingResult);
         User user = modelMapper.map(userSaveDto, User.class);
         return userService.createUser(user);
     }
@@ -82,6 +80,7 @@ public class UserController {
         User userUpdate = userService.updateUser(user);
         return modelMapper.map(userUpdate, UserGetDto.class);
     }
+
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         relationService.deleteUser(id);

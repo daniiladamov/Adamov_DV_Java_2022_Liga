@@ -10,6 +10,7 @@ import homework.entity.user.User_;
 import homework.repository.TaskRepo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,58 +52,48 @@ public class TaskService {
         taskRepo.save(task);
     }
 
-//    public Page<Task> getPages(TaskPage taskPage) {
-//        Sort sort = Sort.by(taskPage.getSortDirection(), taskPage.getSortBy());
-//        Pageable pageable = PageRequest.of(taskPage.getPageNumber(), taskPage.getPageSize(), sort);
-//        return taskRepo.findAll(pageable);
-//    }
-
     public List<Task> getTaskMaxCount(TaskFilter taskFilter) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Task> cq = criteriaBuilder.createQuery(Task.class);
-        Root<Task> root = cq.from(Task.class);
-        Predicate[] predicates = getPredicateList(taskFilter, criteriaBuilder, root).toArray(Predicate[]::new);
-        cq.where(predicates);
-        return entityManager.createQuery(cq).getResultList();
+        return taskRepo.findAll(tasksByUser(taskFilter,getMaxTasksUser()));
     }
-
     private User getMaxTasksUser() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> cq = cb.createQuery(User.class);
         Root<Task> root = cq.from(Task.class);
         Join<Task, User> user = root.join(Task_.user);
-        cq.select(user)
+        cq
+                .select(root.get(Task_.user))
                 .groupBy(user.get(User_.id))
-                .orderBy(cb.desc(cb.count(root.get(Task_.id))));
+                .orderBy(cb.desc(cb.count(root.get(Task_.user))));
         return entityManager.createQuery(cq).getResultList().get(0);
     }
-
-    private List<Predicate> getPredicateList(TaskFilter taskFilter, CriteriaBuilder criteriaBuilder, Root<Task> root) {
-        List<Predicate> list = new ArrayList<>();
-        User maxUser = getMaxTasksUser();
-        if (maxUser != null) {
-            Predicate equal = criteriaBuilder.equal(root.get(Task_.user), maxUser);
-            list.add(equal);
+    private static Specification<Task> tasksByUser(TaskFilter taskFilter, User user){
+        Specification<Task> specification;
+        if (Objects.nonNull(user)) {
+            specification= (root, query, criteriaBuilder1) ->
+                    criteriaBuilder1.equal(root.get(Task_.user), user);
         }
-        if (taskFilter == null)
-            return list;
-        if (taskFilter.getEnumStatuses() != null) {
-            Predicate status = root.get("status").in(taskFilter.getEnumStatuses());
-            list.add(status);
+        else
+            return null;
+        if (Objects.isNull(taskFilter))
+            return specification;
+        if (Objects.nonNull(taskFilter.getEnumStatuses())) {
+            specification=specification.and((Specification<Task>) (root, query, criteriaBuilder12) ->
+                    root.get("status").in(taskFilter.getEnumStatuses()));
         }
-        if (taskFilter.getDateFrom() != null) {
-            Predicate status = criteriaBuilder.greaterThanOrEqualTo(root.get("date"),
-                    getDateFormat(taskFilter.getDateFrom()));
-            list.add(status);
+        if (Objects.nonNull(taskFilter.getDateFrom())) {
+            specification=specification.and((Specification<Task>) (root, query, criteriaBuilder13) ->
+                    criteriaBuilder13.greaterThanOrEqualTo(
+                            root.get("date"), getDateFormat(taskFilter.getDateFrom())
+                    ));
         }
-        if (taskFilter.getDateTo() != null) {
-            Predicate status = criteriaBuilder.lessThanOrEqualTo(root.get("date"),
-                    getDateFormat(taskFilter.getDateTo()));
-            list.add(status);
+        if (Objects.nonNull(taskFilter.getDateTo())) {
+            specification=specification.and((Specification<Task>) (root, query, criteriaBuilder14) ->
+                    criteriaBuilder14.lessThanOrEqualTo(
+                            root.get("date"), getDateFormat(taskFilter.getDateTo())
+                    ));
         }
-        return list;
+        return specification;
     }
-
     private static Calendar getDateFormat(String stringDate) {
         LocalDate date = LocalDate.parse(stringDate, dateFormat);
         return GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));

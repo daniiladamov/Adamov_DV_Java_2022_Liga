@@ -15,3 +15,9 @@ spring:
     baseline-on-migrate: true
 
 exception_message: Объект %s c id=%d не найден
+
+jwt:
+  secret_key: Pax Pamir
+  life_time_hours: 3
+  subject: User details
+api_name: api/v2

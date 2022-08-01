@@ -2,7 +2,6 @@ package homework.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,11 +14,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
-    @Value("${jwt.prefix}")
-    private String jwtPrefix;
+    private final String jwtPrefix="Bearer ";
     private final JwtGenerator jwtGenerator;
     private final UserDetailsService detailsService;
 
@@ -29,11 +29,9 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String authorization = request.getHeader("Authorization");
 
-        if (authorization.startsWith(jwtPrefix)){
+        if (Objects.nonNull(authorization) && authorization.startsWith(jwtPrefix)){
             String jwt=authorization.replace(jwtPrefix,"");
             if (jwt.isBlank()){
-//                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "невалидный jwt-токен в заголовке " +
-//                        "запроса");
                 throw new JWTVerificationException("верификация не пройдена");
             }
             else {
@@ -46,7 +44,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 if (SecurityContextHolder.getContext().getAuthentication()==null){
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-
             }
         }
         filterChain.doFilter(request,response);

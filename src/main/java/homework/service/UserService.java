@@ -8,6 +8,7 @@ import homework.util.CustomPage;
 import homework.util.Specifications;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.h2.security.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -104,5 +105,17 @@ public class UserService {
         else
             throw new EntityNotFoundException(
                     String.format(exceptionMessage,Project.class.getSimpleName(), id));
+    }
+    @Transactional
+    public void updateJwtToken(String refreshToken, String login) throws AuthenticationException {
+        Optional<User> userOptional=userRepo.findByLogin(login);
+        if (userOptional.isPresent()){
+            User user=userOptional.get();
+            user.setRefreshJwtToken(refreshToken);
+            userRepo.save(user);
+        }
+        else
+            throw new AuthenticationException();
+
     }
 }

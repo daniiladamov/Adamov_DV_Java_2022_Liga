@@ -2,6 +2,7 @@ package homework.controller;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import homework.exception.EntityNotFoundException;
+import org.h2.security.auth.AuthenticationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,5 +58,12 @@ public class СustomControllerAdvice extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String verificationJwtFalls(){
         return "JWT-токен не прошел верификацию на сервере приложения";
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String authenticationFalls(){
+
+        return "Аутентификация пользователя провалена";
     }
 }

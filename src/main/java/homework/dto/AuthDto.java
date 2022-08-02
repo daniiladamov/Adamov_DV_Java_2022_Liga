@@ -7,7 +7,6 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-@NoArgsConstructor
 @Getter
 @Setter
 public class AuthDto {

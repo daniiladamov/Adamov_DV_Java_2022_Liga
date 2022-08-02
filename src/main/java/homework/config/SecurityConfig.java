@@ -27,8 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
    private final JwtFilter jwtFilter;
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(detailsService).
-                passwordEncoder(getPasswordEncoder());
+        auth.userDetailsService(detailsService).passwordEncoder(getPasswordEncoder());
     }
 
     @Override
@@ -42,17 +41,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
         http.
                 csrf().disable().
                 authorizeRequests().
-                antMatchers(HttpMethod.POST,"/v2/users","v2/users/refresh-jwt").anonymous().
+                antMatchers(HttpMethod.POST, "/v2/users", "/v2/auth","/v2/auth/**").
+                anonymous().
                 anyRequest().authenticated().
                 and().
+                addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).
                 formLogin().defaultSuccessUrl("/swagger-ui/#").
                 and().
                 httpBasic(Customizer.withDefaults()).
-                logout().logoutUrl("/logout").logoutSuccessUrl("/login").
+                logout().logoutUrl("/logout").
+                logoutSuccessUrl("/login").
                 and().
                 sessionManagement().
                 sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
     @Bean
     public PasswordEncoder getPasswordEncoder(){

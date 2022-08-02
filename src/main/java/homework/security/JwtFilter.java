@@ -1,6 +1,7 @@
 package homework.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import homework.service.JwtGeneratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +21,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final String jwtPrefix="Bearer ";
-    private final JwtGenerator jwtGenerator;
+    private final JwtGeneratorService jwtGeneratorService;
     private final UserDetailsService detailsService;
 
     @Override
@@ -32,10 +33,10 @@ public class JwtFilter extends OncePerRequestFilter {
         if (Objects.nonNull(authorization) && authorization.startsWith(jwtPrefix)){
             String jwt=authorization.replace(jwtPrefix,"");
             if (jwt.isBlank()){
-                throw new JWTVerificationException("верификация не пройдена");
+                throw new JWTVerificationException("верификация jwt-токена не пройдена");
             }
             else {
-                String userName = jwtGenerator.validateJwtToken(jwt);
+                String userName = jwtGeneratorService.validateJwtAccessToken(jwt);
                 UserDetails userDetails=detailsService.loadUserByUsername(userName);
                 UsernamePasswordAuthenticationToken authToken=
                         new UsernamePasswordAuthenticationToken(userDetails,

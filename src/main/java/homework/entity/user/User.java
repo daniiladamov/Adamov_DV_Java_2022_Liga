@@ -43,6 +43,8 @@ public class User {
     @Column(name="role")
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
+    @Column(name = "refresh_token")
+    private String refreshJwtToken;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @Fetch(FetchMode.SUBSELECT)

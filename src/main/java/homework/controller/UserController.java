@@ -5,19 +5,18 @@ import homework.entity.Project;
 import homework.entity.task.Task;
 import homework.entity.user.User;
 import homework.exception.EntityNotFoundException;
-import homework.security.JwtGenerator;
+import homework.service.JwtGeneratorService;
 import homework.service.ProjectService;
 import homework.service.TaskService;
 import homework.service.UserService;
 import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
+import org.h2.security.auth.AuthenticationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
-    private final AuthenticationManager authenticationManager;
-    private final JwtGenerator jwtGenerator;
+    private final JwtGeneratorService jwtGeneratorService;
     private final TaskService taskService;
     private final ProjectService projectService;
     private final UserService userService;
@@ -55,26 +53,14 @@ public class UserController {
         return users.map(u -> modelMapper.map(u, UserGetDto.class));
     }
 
-    @PostMapping("/refresh-jwt")
-    public String refreshJwt(@Validated @RequestBody AuthDto authDto) {
-        UsernamePasswordAuthenticationToken authToken=
-                new UsernamePasswordAuthenticationToken(authDto.getPassword(),
-                        authDto.getUsername());
-        try {
-            authenticationManager.authenticate(authToken);
-        }
-        catch (Exception ex){
-            return "Аутентификация не пройдена";
-        }
-        return jwtGenerator.generateToken(authToken.getName());
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createUser(@Validated @RequestBody UserSaveDto userSaveDto){
+    public JwtResponse createUser(@Validated @RequestBody UserSaveDto userSaveDto) throws AuthenticationException {
         User user = modelMapper.map(userSaveDto, User.class);
         userService.createUser(user);
-        return jwtGenerator.generateToken(user.getLogin());
+        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(user.getLogin());
+        userService.updateJwtToken(jwtResponse.getRefreshToken(), user.getLogin());
+        return jwtResponse;
     }
     @GetMapping("/{id}")
     public UserGetDto getUser(@PathVariable Long id) {

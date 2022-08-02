@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -58,8 +59,9 @@ public class UserController {
     public JwtResponse createUser(@Validated @RequestBody UserSaveDto userSaveDto) throws AuthenticationException {
         User user = modelMapper.map(userSaveDto, User.class);
         userService.createUser(user);
-        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(user.getLogin());
-        userService.updateJwtToken(jwtResponse.getRefreshToken(), user.getLogin());
+        Date date = new Date();
+        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(user.getLogin(), date);
+        userService.updateJwtTokenDate(date.getTime(), user.getLogin());
         return jwtResponse;
     }
     @GetMapping("/{id}")

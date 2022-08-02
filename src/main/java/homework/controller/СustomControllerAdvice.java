@@ -1,5 +1,6 @@
 package homework.controller;
 
+import com.auth0.jwt.exceptions.IncorrectClaimException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import homework.exception.EntityNotFoundException;
 import org.h2.security.auth.AuthenticationException;
@@ -54,7 +55,7 @@ public class СustomControllerAdvice extends ResponseEntityExceptionHandler {
                 + e.getMessage()).collect(Collectors.joining("\n"));
 
     }
-    @ExceptionHandler(JWTVerificationException.class)
+    @ExceptionHandler({JWTVerificationException.class, IncorrectClaimException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String verificationJwtFalls(){
         return "JWT-токен не прошел верификацию на сервере приложения";

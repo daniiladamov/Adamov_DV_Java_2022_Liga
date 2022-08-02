@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JwtRefresh {
-    private String jwtRefreshToken;
+    private String refreshToken;
 }

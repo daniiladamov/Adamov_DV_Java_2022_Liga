@@ -107,11 +107,11 @@ public class UserService {
                     String.format(exceptionMessage,Project.class.getSimpleName(), id));
     }
     @Transactional
-    public void updateJwtToken(String refreshToken, String login) throws AuthenticationException {
+    public void updateJwtTokenDate(long time, String login) throws AuthenticationException {
         Optional<User> userOptional=userRepo.findByLogin(login);
         if (userOptional.isPresent()){
             User user=userOptional.get();
-            user.setRefreshJwtToken(refreshToken);
+            user.setRefreshDate(time);
             userRepo.save(user);
         }
         else

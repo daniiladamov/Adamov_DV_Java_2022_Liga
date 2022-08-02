@@ -2,12 +2,10 @@ package homework.dto;
 
 import homework.entity.user.RoleEnum;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class UserAppDto {
     private Long id;
     private String password;
@@ -16,4 +14,5 @@ public class UserAppDto {
     private String surname;
     private String login;
     private RoleEnum role;
+    private Long refreshDate;
 }

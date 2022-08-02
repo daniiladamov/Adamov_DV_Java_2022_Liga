@@ -3,9 +3,9 @@ package homework.security;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import homework.service.JwtGeneratorService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.internal.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Objects;
 
 @Component
@@ -36,14 +37,17 @@ public class JwtFilter extends OncePerRequestFilter {
                 throw new JWTVerificationException("верификация jwt-токена не пройдена");
             }
             else {
-                String userName = jwtGeneratorService.validateJwtAccessToken(jwt);
-                UserDetails userDetails=detailsService.loadUserByUsername(userName);
-                UsernamePasswordAuthenticationToken authToken=
-                        new UsernamePasswordAuthenticationToken(userDetails,
-                                userDetails.getPassword(),
-                                userDetails.getAuthorities());
-                if (SecurityContextHolder.getContext().getAuthentication()==null){
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                Pair<String, Date> jwtInfo = jwtGeneratorService.validateJwtAccessToken(jwt);
+                CustomUserDetails userDetails = (CustomUserDetails) detailsService.loadUserByUsername(jwtInfo.getLeft());
+                if (jwtInfo.getRight().getTime() >=
+                        userDetails.getUser().getRefreshDate()) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails,
+                                    userDetails.getPassword(),
+                                    userDetails.getAuthorities());
+                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
         }

@@ -2,7 +2,10 @@ package homework.entity.user;
 
 import homework.entity.Project;
 import homework.entity.task.Task;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -43,8 +46,8 @@ public class User {
     @Column(name="role")
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
-    @Column(name = "refresh_token")
-    private String refreshJwtToken;
+    @Column(name = "refresh_date")
+    private Long refreshDate;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @Fetch(FetchMode.SUBSELECT)

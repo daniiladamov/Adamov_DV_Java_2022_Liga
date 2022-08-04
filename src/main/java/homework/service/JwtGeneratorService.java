@@ -5,17 +5,17 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import homework.dto.JwtResponse;
-import homework.entity.user.User;
+import homework.dto.response.JwtResponse;
+import homework.entity.User;
 import homework.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.internal.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,14 +29,15 @@ public class JwtGeneratorService {
     @Value("${jwt.subject}")
     private String subject;
     @Value("${jwt.life_time_access}")
-    private int lifeTimeAcces;
+    private int lifeTimeAccess;
     @Value("${jwt.life_time_refresh}")
     private int lifeTimeRefresh;
     @Value("${api_name}")
     private String apiName;
 
     public String generateToken(String username,String secretKey, int lifeTime, String uuid){
-        User user = userRepo.findByLogin(username).orElse(null);
+        User user = userRepo.findByLogin(username).orElseThrow(()->
+                new UsernameNotFoundException("Пользователь не найден"));
         user.setUuid(uuid);
         userRepo.save(user);
         Date tokenLifeCycle=
@@ -53,14 +54,9 @@ public class JwtGeneratorService {
 
     public JwtResponse generateTokens(String username){
         String uuid= UUID.randomUUID().toString();
-        String accessToken=generateToken(username,secretAccessKey, lifeTimeAcces,uuid);
+        String accessToken=generateToken(username,secretAccessKey, lifeTimeAccess,uuid);
         String refreshToken=generateToken(username,secretRefreshKey, lifeTimeRefresh,uuid);
         return new JwtResponse(accessToken,refreshToken);
-    }
-
-    public String generateJwtAccessToken(String username){
-        User user = userRepo.findByLogin(username).orElse(null);
-        return generateToken(username,secretAccessKey, lifeTimeAcces, user.getUuid());
     }
     public Pair<String, String> validateJwtAccessToken(String jwtToken){
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretAccessKey))
@@ -81,15 +77,12 @@ public class JwtGeneratorService {
         DecodedJWT decodedJWT = verifier.verify(jwtToken);
         String username = decodedJWT.getClaim("username").asString();
         String jwtUuid = decodedJWT.getClaim("uuid").asString();
-        Optional<User> byLogin = userRepo.findByLogin(username);
-        if(byLogin.isPresent()){
-            String uuid=byLogin.get().getUuid();
+        User user = userRepo.findByLogin(username).orElseThrow(()->
+                new JWTVerificationException(""));
+            String uuid=user.getUuid();
             if (uuid.equals(jwtUuid))
                 return username;
             else
                 throw new JWTVerificationException("");
-        }
-        throw new JWTVerificationException("");
-
     }
 }

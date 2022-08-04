@@ -1,6 +1,5 @@
 package homework.config;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -17,10 +16,5 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build();
-    }
-
-    @Bean
-    public ModelMapper getModelMapper(){
-        return new ModelMapper();
     }
 }

@@ -1,13 +1,6 @@
 package homework.util;
 
-import homework.entity.Comment;
-import homework.entity.Comment_;
-import homework.entity.Project;
-import homework.entity.Project_;
-import homework.entity.task.Task;
-import homework.entity.task.Task_;
-import homework.entity.user.User;
-import homework.entity.user.User_;
+import homework.entity.*;
 import org.springframework.data.jpa.domain.Specification;
 
 public class Specifications {

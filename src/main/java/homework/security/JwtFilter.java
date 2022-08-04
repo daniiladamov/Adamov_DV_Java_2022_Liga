@@ -3,7 +3,7 @@ package homework.security;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import homework.service.JwtGeneratorService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.internal.Pair;
+import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Objects;
 
 @Component
@@ -38,8 +37,8 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             else {
                 Pair<String, String> jwtInfo = jwtGeneratorService.validateJwtAccessToken(jwt);
-                CustomUserDetails userDetails = (CustomUserDetails) detailsService.loadUserByUsername(jwtInfo.getLeft());
-                if (jwtInfo.getRight().equals(userDetails.getUser().getUuid())) {
+                CustomUserDetails userDetails = (CustomUserDetails) detailsService.loadUserByUsername(jwtInfo.getFirst());
+                if (jwtInfo.getSecond().equals(userDetails.getUser().getUuid())) {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userDetails,
                                     userDetails.getPassword(),

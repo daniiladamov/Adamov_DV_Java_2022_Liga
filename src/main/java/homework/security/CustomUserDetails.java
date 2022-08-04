@@ -1,6 +1,6 @@
 package homework.security;
 
-import homework.dto.UserAppDto;
+import homework.dto.security.UserAppDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -49,5 +49,4 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }

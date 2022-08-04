@@ -1,7 +1,7 @@
 package homework.service;
 
 import homework.entity.Project;
-import homework.entity.user.User;
+import homework.entity.User;
 import homework.exception.EntityNotFoundException;
 import homework.repository.ProjectRepo;
 import homework.util.CustomPage;
@@ -16,16 +16,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProjectService {
-    @PersistenceContext
-    private final EntityManager entityManager;
     private final ProjectRepo projectRepo;
     @Value("${exception_message}")
     private String exceptionMessage;
@@ -42,52 +38,35 @@ public class ProjectService {
         return savedProject.getId();
     }
 
+    public Project getProject(@NonNull Long id) {
+        return projectRepo.findById(id).orElseThrow(() ->
+                new EntityNotFoundException(String.format(exceptionMessage,
+                        Project.class.getSimpleName(), id)));
 
-    public Optional<Project> getProject(@NonNull Long id) {
-        return projectRepo.findById(id);
     }
+
     @Transactional
     public Project updateProject(Project project) {
-        Optional<Project> projectInBd=projectRepo.findById(project.getId());
-        if (projectInBd.isPresent()){
+        Optional<Project> projectInBd = projectRepo.findById(project.getId());
+        if (projectInBd.isPresent()) {
             Project updateProject = projectRepo.save(project);
             return updateProject;
-        }
-        else throw new EntityNotFoundException(String.format(exceptionMessage,
-                Project.class.getSimpleName(),project.getId()));
-    }
-    private Project deleteProject(Long id) {
-        Optional<Project> projectInBd=projectRepo.findById(id);
-        if (projectInBd.isPresent()){
-            projectRepo.delete(projectInBd.get());
-            return projectInBd.get();
-        }
-        else throw new EntityNotFoundException(String.format(exceptionMessage,
-                Project.class.getSimpleName(),id));
+        } else throw new EntityNotFoundException(String.format(exceptionMessage,
+                Project.class.getSimpleName(), project.getId()));
     }
 
-    private Page<Project> getProjectsByUser(User user, Pageable pageable){
-        return projectRepo.findAll(Specifications.getUserProjects(user),pageable);
-    }
     @Transactional
-    public void deleteProject(Optional<Project> projectOptional, Long projectId) {
-        if (projectOptional.isPresent()){
-            entityManager.createNativeQuery("delete from project_user where project_id= :id")
-                    .setParameter("id",projectId).executeUpdate();
-            deleteProject(projectId);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,Project.class.getSimpleName(),projectId));
+    public Project deleteProject(Long id) {
+        Project projectInBd = projectRepo.findById(id).orElseThrow(() ->
+                new EntityNotFoundException(String.format(exceptionMessage, Project.class.getSimpleName(), id)));
+        projectRepo.delete(projectInBd);
+        return projectInBd;
     }
-    public Page<Project> getUserProjects(Optional<User> userOptional, Long id, CustomPage customPage) {
-        if (userOptional.isPresent()){
-            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
-            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
-            return getProjectsByUser(userOptional.get(),pageable);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,User.class.getSimpleName(), id));
+
+    private Page<Project> getProjectsByUser(User user, Pageable pageable) {
+        return projectRepo.findAll(Specifications.getUserProjects(user), pageable);
+    }
+    public Page<Project> getUserProjects(User user, Pageable pageable) {
+            return getProjectsByUser(user, pageable);
     }
 }

@@ -1,6 +1,6 @@
 package homework.util.validator;
 
-import homework.entity.user.User;
+import homework.entity.User;
 import homework.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

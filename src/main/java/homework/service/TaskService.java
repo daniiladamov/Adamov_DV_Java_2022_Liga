@@ -1,17 +1,14 @@
 package homework.service;
 
 import com.sun.istack.NotNull;
-import homework.entity.project.Project;
-import homework.entity.task.Task;
-import homework.entity.task.TaskFilter;
-import homework.entity.task.Task_;
-import homework.entity.user.User;
-import homework.entity.user.User_;
+import homework.entity.Project;
+import homework.entity.Task;
+import homework.entity.User;
 import homework.exception.EntityNotFoundException;
 import homework.repository.TaskRepo;
 import homework.util.CustomPage;
-import homework.util.enums.EnumStatus;
 import homework.util.Specifications;
+import homework.util.enums.EnumStatus;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,24 +34,21 @@ public class TaskService {
     private EntityManager entityManager;
     @Value("${exception_message}")
     private String exceptionMessage;
-    @PostAuthorize("hasRole('ADMIN') || " +
-            "(returnObject.isPresent() && returnObject.get().user.login==authentication.name)")
-    public Optional<Task> getTask(@NonNull Long id) {
-        return taskRepo.findById(id);
+
+    @PostAuthorize("hasRole('ADMIN') || returnObject.user.login==authentication.name")
+    public Task getTask(@NonNull Long id) {
+        return taskRepo.findById(id).orElseThrow(() ->
+                new EntityNotFoundException(String.format(exceptionMessage, Task.class.getSimpleName(), id)));
     }
 
     @Transactional
     public boolean removeTask(@NonNull Long id) {
-        Optional<Task> task = getTask(id);
-        if (task.isPresent()) {
-            taskRepo.delete(task.get());
-            return true;
-        } else
-            return false;
+        removeTask(getTask(id));
+        return true;
     }
 
     @Transactional
-    public Task updateTask(@NonNull Task task){
+    public Task updateTask(@NonNull Task task) {
         return taskRepo.save(task);
     }
 
@@ -76,101 +66,33 @@ public class TaskService {
         return taskRepo.findAll(pageable);
     }
 
-    public List<Task> getTaskMaxCount(TaskFilter taskFilter) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Task> cq = criteriaBuilder.createQuery(Task.class);
-        Root<Task> root = cq.from(Task.class);
-        Predicate[] predicates = getPredicateList(taskFilter, criteriaBuilder, root).toArray(Predicate[]::new);
-        cq.where(predicates);
-        return entityManager.createQuery(cq).getResultList();
-    }
-
-    private User getMaxTasksUser() {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<Task> root = cq.from(Task.class);
-        Join<Task, User> user = root.join(Task_.user);
-        cq.select(user)
-                .groupBy(user.get(User_.id))
-                .orderBy(cb.desc(cb.count(root.get(Task_.id))));
-        return entityManager.createQuery(cq).getResultList().get(0);
-    }
-
-    private List<Predicate> getPredicateList(TaskFilter taskFilter, CriteriaBuilder criteriaBuilder, Root<Task> root) {
-        List<Predicate> list = new ArrayList<>();
-        User maxUser = getMaxTasksUser();
-        if (maxUser != null) {
-            Predicate equal = criteriaBuilder.equal(root.get(Task_.user), maxUser);
-            list.add(equal);
-        }
-        if (taskFilter == null)
-            return list;
-        if (taskFilter.getEnumStatuses() != null) {
-            Predicate status = root.get("status").in(taskFilter.getEnumStatuses());
-            list.add(status);
-        }
-        if (taskFilter.getDateFrom() != null) {
-            Predicate status = criteriaBuilder.greaterThanOrEqualTo(root.get("date"),
-                    getDateFormat(taskFilter.getDateFrom()));
-            list.add(status);
-        }
-        if (taskFilter.getDateTo() != null) {
-            Predicate status = criteriaBuilder.lessThanOrEqualTo(root.get("date"),
-                    getDateFormat(taskFilter.getDateTo()));
-            list.add(status);
-        }
-        return list;
-    }
-
-    private static Calendar getDateFormat(String stringDate) {
-        LocalDate date = LocalDate.parse(stringDate, dateFormat);
-        return GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));
-    }
-
     private Page<Task> getTasksByUser(User user, Pageable pageable) {
-        return taskRepo.findAll(Specifications.getUserTasks(user),pageable);
+        return taskRepo.findAll(Specifications.getUserTasks(user), pageable);
     }
 
     private Page<Task> getTasksByProject(Project project, Pageable pageable) {
-        return taskRepo.findAll(Specifications.getProjectTasks(project),pageable);
+        return taskRepo.findAll(Specifications.getProjectTasks(project), pageable);
+    }
+
+    @Transactional
+    public Long createTask(Task task, User user, Project project) {
+        task.setUser(user);
+        task.setProject(project);
+        project.addUser(user);
+        return save(task);
+    }
+
+    @Transactional
+    public Task updateTask(Long id, Task task) {
+        Task taskInBd = getTask(id);
+        task.setId(id);
+        task.setComment(taskInBd.getComment());
+        task.setUser(taskInBd.getUser());
+        task.setProject(taskInBd.getProject());
+        return updateTask(task);
     }
     @Transactional
-    public Long createTask(Task task, Optional<User> userOptional, Optional<Project> projectOptional,
-                           Long userId, Long projectId) {
-        if (userOptional.isPresent() && projectOptional.isPresent()) {
-            User user=userOptional.get();
-            Project project=projectOptional.get();
-            task.setUser(user);
-            task.setProject(project);
-            project.addUser(user);
-            return save(task);
-        }
-        else{
-            String exception="";
-            if(userOptional.isEmpty())
-                exception=String.format(exceptionMessage+"\n",User.class.getSimpleName(), userId);
-            if(projectOptional.isEmpty())
-                exception+=String.format(exceptionMessage,Project.class.getSimpleName(), projectId);
-            throw new EntityNotFoundException(exception);
-        }
-    }
-    @Transactional
-    public Task updateTask(Optional<Task> taskOptional, Task task) {
-        if (taskOptional.isPresent()){
-            Task taskInBd=taskOptional.get();
-            task.setComment(taskInBd.getComment());
-            task.setUser(taskInBd.getUser());
-            task.setProject(taskInBd.getProject());
-            return updateTask(task);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,Task.class.getSimpleName(),task.getId()));
-    }
-    @Transactional
-    public void removeTask(Optional<Task> taskOptional, Long id) {
-        if (taskOptional.isPresent()){
-            Task task=taskOptional.get();
+    public void removeTask(Task task) {
             long taskForUserByProject=task.getUser().getTaskList().stream().
                     filter(t->t.getProject().equals(task.getProject())).count();
             if (taskForUserByProject==1){
@@ -179,32 +101,15 @@ public class TaskService {
                         .setParameter("id",task.getProject().getId())
                         .setParameter("userId",task.getUser().getId()).executeUpdate();
             }
-            removeTask(id);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,Task.class.getSimpleName(),id));
+            taskRepo.delete(task);
     }
     @PostAuthorize("hasRole('ADMIN') || returnObject.getContent().get(0).user.login==authentication.name")
-    public Page<Task> getUserTasks(Optional<User> userOptional, Long id, CustomPage customPage) {
-        if (userOptional.isPresent()){
-            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
-            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
-            return getTasksByUser(userOptional.get(),pageable);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,User.class.getSimpleName(), id));
+    public Page<Task> getUserTasks(User user,Pageable pageable) {
+        return getTasksByUser(user, pageable);
     }
 
-    public Page<Task> getProjectTasks(Optional<Project> projectOptional, Long id, CustomPage customPage) {
-        if (projectOptional.isPresent()){
-            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
-            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
-            return getTasksByProject(projectOptional.get(),pageable);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,Project.class.getSimpleName(), id));
+    public Page<Task> getProjectTasks(Project project, Pageable pageable) {
+        return getTasksByProject(project, pageable);
+
     }
 }

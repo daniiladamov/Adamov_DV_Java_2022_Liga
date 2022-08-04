@@ -1,87 +1,85 @@
 package homework.controller;
 
-import homework.entity.project.Project;
-import homework.entity.project.ProjectGetDto;
-import homework.entity.task.Task;
-import homework.entity.task.TaskGetDto;
-import homework.entity.user.User;
-import homework.entity.user.UserGetDto;
-import homework.entity.user.UserSaveDto;
-import homework.exception.EntityNotFoundException;
+import homework.dto.request.UserSaveDto;
+import homework.dto.response.JwtResponse;
+import homework.dto.response.ProjectGetDto;
+import homework.dto.response.TaskGetDto;
+import homework.dto.response.UserGetDto;
+import homework.entity.Project;
+import homework.entity.Task;
+import homework.entity.User;
+import homework.mapper.ProjectMapper;
+import homework.mapper.TaskMapper;
+import homework.mapper.UserMapper;
+import homework.service.JwtGeneratorService;
 import homework.service.ProjectService;
 import homework.service.TaskService;
 import homework.service.UserService;
 import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
+import org.h2.security.auth.AuthenticationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/users")
 public class UserController {
+    private final JwtGeneratorService jwtGeneratorService;
     private final TaskService taskService;
     private final ProjectService projectService;
     private final UserService userService;
-    private final ModelMapper modelMapper;
-    @Value("${exception_message}")
-    private String exceptionMessage;
+    private final ProjectMapper projectMapper;
+    private final TaskMapper taskMapper;
+    private final UserMapper userMapper;
     @GetMapping("/{id}/projects")
-    public Page<ProjectGetDto> getProjects(@PathVariable Long id, CustomPage customPage) {
-        Optional<User> userOptional=userService.getUser(id);
-        Page<Project> projects = projectService.getUserProjects(userOptional,id, customPage);
-        return projects.map(p -> modelMapper.map(p, ProjectGetDto.class));
+    public Page<ProjectGetDto> getProjects(@PathVariable Long id, Pageable pageable) {
+        User user=userService.getUser(id);
+        Page<Project> projects = projectService.getUserProjects(user, pageable);
+        return projects.map(p -> projectMapper.toResponse(p));
     }
     @GetMapping("/{id}/tasks")
-    public Page<TaskGetDto> getTasks(@PathVariable Long id, CustomPage customPage) {
-        Optional<User> userOptional=userService.getUser(id);
-        Page<Task> tasks = taskService.getUserTasks(userOptional,id, customPage);
-        return tasks.map(t -> modelMapper.map(t, TaskGetDto.class));
+    public Page<TaskGetDto> getTasks(@PathVariable Long id, Pageable pageable) {
+        User user=userService.getUser(id);
+        Page<Task> tasks = taskService.getUserTasks(user,pageable);
+        return tasks.map(t -> taskMapper.toResponse(t));
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Page<UserGetDto> getUsers(CustomPage customPage) {
         Page<User> users = userService.getUsers(customPage);
-        return users.map(u -> modelMapper.map(u, UserGetDto.class));
+        return users.map(u -> userMapper.toResponse(u));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createUser(@Validated @RequestBody UserSaveDto userSaveDto){
-        User user = modelMapper.map(userSaveDto, User.class);
-        return userService.createUser(user);
+    public JwtResponse createUser(@Validated @RequestBody UserSaveDto userSaveDto) throws AuthenticationException {
+        User user = userMapper.toEntity(userSaveDto);
+        userService.createUser(user);
+        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(user.getLogin());
+        return jwtResponse;
     }
     @GetMapping("/{id}")
     public UserGetDto getUser(@PathVariable Long id) {
-        Optional<User> user = userService.getUser(id);
-        if (user.isPresent()) {
-            return modelMapper.map(user.get(), UserGetDto.class);
-        } else {
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage, User.class.getSimpleName(), id));
-        }
+        User user = userService.getUser(id);
+        return userMapper.toResponse(user);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public UserGetDto updateUser(@Validated @RequestBody UserSaveDto userSaveDto, @PathVariable Long id) {
-        User user = modelMapper.map(userSaveDto, User.class);
+        User user = userMapper.toEntity(userSaveDto);
         user.setId(id);
-        User userUpdate = userService.updateUser(user);
-        return modelMapper.map(userUpdate, UserGetDto.class);
+        return userMapper.toResponse(userService.updateUser(user));
     }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
-        Optional<User> userOptional=userService.getUser(id);
-        userService.deleteUser(userOptional,id);
+        userService.deleteUser(id);
     }
 }

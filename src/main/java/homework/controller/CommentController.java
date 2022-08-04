@@ -1,45 +1,34 @@
 package homework.controller;
 
-import homework.entity.comment.Comment;
-import homework.entity.comment.CommentGetDto;
-import homework.entity.comment.CommentSaveDto;
-import homework.exception.EntityNotFoundException;
+import homework.dto.request.CommentSaveDto;
+import homework.dto.response.CommentGetDto;
+import homework.entity.Comment;
+import homework.mapper.CommentMapper;
 import homework.service.CommentService;
-import homework.util.CustomPage;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/v2/comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
-    private final ModelMapper modelMapper;
-    @Value("${exception_message}")
-    private String exceptionMessage;
+    private final CommentMapper commentMapper;
 
     @GetMapping
-    public Page<CommentGetDto> getComment(CustomPage customPage) {
-        Page<Comment> comments = commentService.getComments(customPage);
-        return comments.map(c -> modelMapper.map(c, CommentGetDto.class));
+    public Page<CommentGetDto> getComments(Pageable page) {
+        Page<Comment> comments = commentService.getComments(page);
+        return comments.map(c -> commentMapper.toResponse(c));
     }
 
     @GetMapping("/{id}")
     public CommentGetDto getComment(@PathVariable Long id) {
-        Optional<Comment> comment = commentService.getComment(id);
-        if (comment.isPresent()) {
-            CommentGetDto commentGetDto = modelMapper.map(comment.get(), CommentGetDto.class);
-            return commentGetDto;
-        } else {
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage, Comment.class.getSimpleName(), id));
-        }
+        Comment comment = commentService.getComment(id);
+        return  commentMapper.toResponse(comment);
     }
 
     @DeleteMapping("/{id}")
@@ -50,11 +39,9 @@ public class CommentController {
     @PutMapping("/{id}")
     public CommentGetDto updateComment(@PathVariable Long id,
                                        @Valid @RequestBody CommentSaveDto commentSaveDto) {
-        Comment comment = modelMapper.map(commentSaveDto, Comment.class);
-        comment.setId(id);
-        Optional<Comment> commentOptional=commentService.getComment(comment.getId());
-        Comment updateComment = commentService.updateComment(commentOptional,comment);
-        return modelMapper.map(updateComment, CommentGetDto.class);
+        Comment comment = commentMapper.toEntity(commentSaveDto);
+        Comment updateComment = commentService.updateComment(id,comment);
+        return commentMapper.toResponse(updateComment);
     }
 
 }

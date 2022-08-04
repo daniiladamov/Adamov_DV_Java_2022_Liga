@@ -1,17 +1,14 @@
 package homework.service;
 
-import homework.entity.comment.Comment;
-import homework.entity.task.Task;
+import homework.entity.Comment;
+import homework.entity.Task;
 import homework.exception.EntityNotFoundException;
 import homework.repository.CommentRepo;
-import homework.util.CustomPage;
 import homework.util.Specifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,19 +22,17 @@ public class CommentService {
     @Value("${exception_message}")
     private String exceptionMessage;
 
-    public Page<Comment> getComments(CustomPage customPage) {
-        Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
-        Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
+    public Page<Comment> getComments(Pageable pageable){
         return commentRepo.findAll(pageable);
     }
 
-    public Optional<Comment> getComment(Long id) {
-        return commentRepo.findById(id);
+    public Comment getComment(Long id) {
+        return commentRepo.findById(id).orElseThrow(()->
+                new EntityNotFoundException(String.format(exceptionMessage, Comment.class.getSimpleName(), id)));
     }
 
     private Comment create(Comment comment) {
         return commentRepo.save(comment);
-
     }
     @Transactional
     public void remove(Long id) {
@@ -48,42 +43,26 @@ public class CommentService {
         else
             throw new EntityNotFoundException(
                     String.format(exceptionMessage, Task.class.getSimpleName(),id));
-
     }
 
     private Page<Comment> getCommentsByTask(Task task, Pageable pageable) {
         return commentRepo.findAll(Specifications.getTaskComments(task),pageable);
     }
     @Transactional
-    public Long createComment(Comment comment, Optional<Task> taskOptional, Long taskId) {
-        if (taskOptional.isPresent()){
-            comment.setTask(taskOptional.get());
+    public Long createComment(Comment comment, Task task) {
+            comment.setTask(task);
             return create(comment).getId();
-        }
-        else
-            throw new EntityNotFoundException(String.format(exceptionMessage,Task.class.getSimpleName(),taskId));
     }
 
     @Transactional
-    public Comment updateComment(Optional<Comment> commentOptional, Comment comment) {
-        if (commentOptional.isPresent()){
-            Comment commentInBd=commentOptional.get();
-            comment.setTask(commentInBd.getTask());
-            return create(comment);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,Comment.class.getSimpleName(),comment.getId()));
+    public Comment updateComment(Long id, Comment commentUpdate) {
+        Comment comment=getComment(commentUpdate.getId());
+            commentUpdate.setTask(comment.getTask());
+            commentUpdate.setId(id);
+            return create(commentUpdate);
     }
 
-    public Page<Comment> getTaskComments(Optional<Task> taskOptional, Long id, CustomPage customPage) {
-        if (taskOptional.isPresent()){
-            Sort sort = Sort.by(customPage.getSortDirection(), customPage.getSortBy());
-            Pageable pageable = PageRequest.of(customPage.getPageNumber(), customPage.getPageSize(), sort);
-            return getCommentsByTask(taskOptional.get(),pageable);
-        }
-        else
-            throw new EntityNotFoundException(
-                    String.format(exceptionMessage,Task.class.getSimpleName(), id));
+    public Page<Comment> getTaskComments(Task task, Pageable pageable) {
+            return getCommentsByTask(task,pageable);
     }
 }

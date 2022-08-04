@@ -1,6 +1,6 @@
 package homework.repository;
 
-import homework.entity.task.Task;
+import homework.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

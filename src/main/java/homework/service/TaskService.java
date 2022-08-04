@@ -35,8 +35,7 @@ public class TaskService {
     @Value("${exception_message}")
     private String exceptionMessage;
 
-    @PostAuthorize("hasRole('ADMIN') || " +
-            "(returnObject.isPresent() && returnObject.get().user.login==authentication.name)")
+    @PostAuthorize("hasRole('ADMIN') || returnObject.user.login==authentication.name")
     public Task getTask(@NonNull Long id) {
         return taskRepo.findById(id).orElseThrow(() ->
                 new EntityNotFoundException(String.format(exceptionMessage, Task.class.getSimpleName(), id)));

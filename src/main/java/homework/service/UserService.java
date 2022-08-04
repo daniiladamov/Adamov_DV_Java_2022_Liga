@@ -33,8 +33,7 @@ public class UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
 
-    @PostAuthorize("hasRole('ADMIN') || " +
-            "(returnObject.isPresent() && returnObject.get().login==authentication.name)")
+    @PostAuthorize("hasRole('ADMIN') || (returnObject.login==authentication.name)")
     public User getUser(@NonNull Long id) {
         return userRepo.findById(id).orElseThrow(() ->
                 new EntityNotFoundException(String.format(exceptionMessage, User.class.getSimpleName(), id)));

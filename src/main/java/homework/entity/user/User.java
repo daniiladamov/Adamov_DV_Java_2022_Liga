@@ -46,8 +46,8 @@ public class User {
     @Column(name="role")
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
-    @Column(name = "refresh_date")
-    private Long refreshDate;
+    @Column(name = "jwt_uuid")
+    private String uuid;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @Fetch(FetchMode.SUBSELECT)

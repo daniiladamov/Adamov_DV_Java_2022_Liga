@@ -106,16 +106,16 @@ public class UserService {
             throw new EntityNotFoundException(
                     String.format(exceptionMessage,Project.class.getSimpleName(), id));
     }
-    @Transactional
-    public void updateJwtTokenDate(long time, String login) throws AuthenticationException {
-        Optional<User> userOptional=userRepo.findByLogin(login);
-        if (userOptional.isPresent()){
-            User user=userOptional.get();
-            user.setRefreshDate(time);
-            userRepo.save(user);
-        }
-        else
-            throw new AuthenticationException();
-
-    }
+//    @Transactional
+//    public void updateJwtTokenDate(long time, String login) throws AuthenticationException {
+//        Optional<User> userOptional=userRepo.findByLogin(login);
+//        if (userOptional.isPresent()){
+//            User user=userOptional.get();
+//            user.setRefreshDate(time);
+//            userRepo.save(user);
+//        }
+//        else
+//            throw new AuthenticationException();
+//
+//    }
 }

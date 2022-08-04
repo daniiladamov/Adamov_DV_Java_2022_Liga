@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class JwtGeneratorService {
     private final UserRepo userRepo;
     @Value("${jwt.secret_access_key}")
     private String secretAccessKey;
-    @Value("{jwt.secret_refresh_key}")
+    @Value("${jwt.secret_refresh_key}")
     private String secretRefreshKey;
     @Value("${jwt.subject}")
     private String subject;
@@ -34,36 +35,42 @@ public class JwtGeneratorService {
     @Value("${api_name}")
     private String apiName;
 
-    public String generateToken(String username,String secretKey, int lifeTime, Date date){
+    public String generateToken(String username,String secretKey, int lifeTime, String uuid){
+        User user = userRepo.findByLogin(username).orElse(null);
+        user.setUuid(uuid);
+        userRepo.save(user);
         Date tokenLifeCycle=
                 Date.from(ZonedDateTime.now().plusMinutes(lifeTime).toInstant());
         return JWT.create()
                 .withSubject(subject)
                 .withClaim("username",username)
-                .withIssuedAt(date)
+                .withClaim("uuid",uuid)
+                .withIssuedAt(new Date())
                 .withIssuer(apiName)
                 .withExpiresAt(tokenLifeCycle)
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
-    public JwtResponse generateTokens(String username, Date date){
-        String accessToken=generateToken(username,secretAccessKey, lifeTimeAcces,date);
-        String refreshToken=generateToken(username,secretRefreshKey, lifeTimeRefresh,date);
+    public JwtResponse generateTokens(String username){
+        String uuid= UUID.randomUUID().toString();
+        String accessToken=generateToken(username,secretAccessKey, lifeTimeAcces,uuid);
+        String refreshToken=generateToken(username,secretRefreshKey, lifeTimeRefresh,uuid);
         return new JwtResponse(accessToken,refreshToken);
     }
 
     public String generateJwtAccessToken(String username){
-        return generateToken(username,secretAccessKey, lifeTimeAcces, new Date());
+        User user = userRepo.findByLogin(username).orElse(null);
+        return generateToken(username,secretAccessKey, lifeTimeAcces, user.getUuid());
     }
-    public Pair<String, Date> validateJwtAccessToken(String jwtToken){
+    public Pair<String, String> validateJwtAccessToken(String jwtToken){
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretAccessKey))
                 .withSubject(subject)
                 .withIssuer(apiName)
                 .build();
         DecodedJWT decodedJWT = verifier.verify(jwtToken);
-        Date issuedAt = decodedJWT.getIssuedAt();
+        String uuid = decodedJWT.getClaim("uuid").asString();
         String username = decodedJWT.getClaim("username").asString();
-        return Pair.of(username,issuedAt);
+        return Pair.of(username,uuid);
 
     }
     public String validateJwtRefreshToken(String jwtToken){
@@ -73,11 +80,11 @@ public class JwtGeneratorService {
                 .build();
         DecodedJWT decodedJWT = verifier.verify(jwtToken);
         String username = decodedJWT.getClaim("username").asString();
-        Date issuedAt = decodedJWT.getIssuedAt();
+        String jwtUuid = decodedJWT.getClaim("uuid").asString();
         Optional<User> byLogin = userRepo.findByLogin(username);
         if(byLogin.isPresent()){
-            long date=byLogin.get().getRefreshDate();
-            if (date==issuedAt.getTime())
+            String uuid=byLogin.get().getUuid();
+            if (uuid.equals(jwtUuid))
                 return username;
             else
                 throw new JWTVerificationException("");

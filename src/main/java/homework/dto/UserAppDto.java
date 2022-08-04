@@ -14,5 +14,5 @@ public class UserAppDto {
     private String surname;
     private String login;
     private RoleEnum role;
-    private Long refreshDate;
+    private String uuid;
 }

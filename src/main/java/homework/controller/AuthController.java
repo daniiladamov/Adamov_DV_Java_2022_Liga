@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/auth")
@@ -30,9 +28,7 @@ public class AuthController {
         UsernamePasswordAuthenticationToken authToken=
                 new UsernamePasswordAuthenticationToken(authDto.getUsername(), authDto.getPassword());
         authenticationManager.authenticate(authToken);
-        Date date = new Date();
-        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(authToken.getName(),date);
-        userService.updateJwtTokenDate(date.getTime(),authToken.getName());
+        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(authToken.getName());
         return jwtResponse;
     }
     @PostMapping("/jwt-access")
@@ -43,9 +39,7 @@ public class AuthController {
     @PostMapping("jwt-refresh")
     public JwtResponse refreshAllTokens(@RequestBody JwtRefresh jwtRefresh) throws AuthenticationException {
         String username= jwtGeneratorService.validateJwtRefreshToken(jwtRefresh.getRefreshToken());
-        Date date = new Date();
-        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(username,date);
-        userService.updateJwtTokenDate(date.getTime(), username);
+        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(username);
         return jwtResponse;
     }
 }

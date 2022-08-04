@@ -14,7 +14,6 @@ public abstract class User_ {
 
 	public static volatile SingularAttribute<User, String> firstName;
 	public static volatile SingularAttribute<User, String> lastName;
-	public static volatile SingularAttribute<User, Long> refreshDate;
 	public static volatile SingularAttribute<User, String> password;
 	public static volatile SingularAttribute<User, RoleEnum> role;
 	public static volatile SetAttribute<User, Project> projects;
@@ -22,10 +21,10 @@ public abstract class User_ {
 	public static volatile ListAttribute<User, Task> taskList;
 	public static volatile SingularAttribute<User, Long> id;
 	public static volatile SingularAttribute<User, String> login;
+	public static volatile SingularAttribute<User, String> uuid;
 
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
-	public static final String REFRESH_DATE = "refreshDate";
 	public static final String PASSWORD = "password";
 	public static final String ROLE = "role";
 	public static final String PROJECTS = "projects";
@@ -33,6 +32,7 @@ public abstract class User_ {
 	public static final String TASK_LIST = "taskList";
 	public static final String ID = "id";
 	public static final String LOGIN = "login";
+	public static final String UUID = "uuid";
 
 }
 

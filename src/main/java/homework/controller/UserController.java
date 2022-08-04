@@ -60,8 +60,7 @@ public class UserController {
         User user = modelMapper.map(userSaveDto, User.class);
         userService.createUser(user);
         Date date = new Date();
-        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(user.getLogin(), date);
-        userService.updateJwtTokenDate(date.getTime(), user.getLogin());
+        JwtResponse jwtResponse = jwtGeneratorService.generateTokens(user.getLogin());
         return jwtResponse;
     }
     @GetMapping("/{id}")

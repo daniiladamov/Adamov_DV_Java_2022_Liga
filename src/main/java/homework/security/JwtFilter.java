@@ -37,10 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 throw new JWTVerificationException("верификация jwt-токена не пройдена");
             }
             else {
-                Pair<String, Date> jwtInfo = jwtGeneratorService.validateJwtAccessToken(jwt);
+                Pair<String, String> jwtInfo = jwtGeneratorService.validateJwtAccessToken(jwt);
                 CustomUserDetails userDetails = (CustomUserDetails) detailsService.loadUserByUsername(jwtInfo.getLeft());
-                if (jwtInfo.getRight().getTime() >=
-                        userDetails.getUser().getRefreshDate()) {
+                if (jwtInfo.getRight().equals(userDetails.getUser().getUuid())) {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userDetails,
                                     userDetails.getPassword(),
